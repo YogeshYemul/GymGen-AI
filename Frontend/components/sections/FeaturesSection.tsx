@@ -17,66 +17,45 @@ const features = [
   {
     icon: Dumbbell,
     title: "AI Workout Generator",
-    description:
-      "Personalized PPL, Arnold, Bro, Upper-Lower, and Full Body splits tailored to your exact goals and experience level.",
+    description: "Personalized training plans tailored to your fitness goals.",
     badge: "Core",
     color: "from-yellow-500/10 to-transparent",
   },
   {
     icon: Apple,
     title: "Smart Diet Planner",
-    description:
-      "BMR/TDEE-based nutrition plans with Vegetarian & Non-Veg options. Precise macro breakdowns for your goal.",
+    description: "AI-powered nutrition plans with precise calorie tracking.",
     badge: "Nutrition",
     color: "from-green-500/10 to-transparent",
   },
   {
     icon: Brain,
     title: "AI Fitness Coach",
-    description:
-      "Chat with your personal AI coach powered by GPT-4. Ask anything about workouts, diet, and form corrections.",
+    description: "Get instant workout and nutrition guidance anytime.",
     badge: "AI",
     color: "from-blue-500/10 to-transparent",
   },
   {
     icon: TrendingUp,
     title: "Progress Tracking",
-    description:
-      "Log weight, measurements, and body fat. Visualize your transformation with beautiful animated charts.",
+    description: "Monitor your fitness journey with visual insights.",
     badge: "Analytics",
     color: "from-purple-500/10 to-transparent",
   },
-  {
-    icon: Trophy,
-    title: "Gamification System",
-    description:
-      "Daily streaks, achievement badges, weekly and monthly fitness challenges to keep you motivated.",
-    badge: "Engagement",
-    color: "from-orange-500/10 to-transparent",
-  },
+
   {
     icon: BarChart2,
     title: "Analytics Dashboard",
-    description:
-      "Deep insights into your workout consistency, diet compliance, and goal completion percentages.",
+    description: "Track performance through detailed fitness analytics.",
     badge: "Insights",
     color: "from-cyan-500/10 to-transparent",
   },
   {
     icon: Bell,
     title: "Smart Notifications",
-    description:
-      "Workout reminders, water intake alerts, and meal timing notifications to keep you on schedule.",
+    description: "Never miss workouts, meals or hydration goals.",
     badge: "Reminders",
     color: "from-pink-500/10 to-transparent",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Private",
-    description:
-      "JWT auth, bcrypt hashing, rate limiting, and input validation. Your data stays yours — always.",
-    badge: "Security",
-    color: "from-red-500/10 to-transparent",
   },
 ];
 
@@ -114,7 +93,7 @@ export default function FeaturesSection() {
         </motion.div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}

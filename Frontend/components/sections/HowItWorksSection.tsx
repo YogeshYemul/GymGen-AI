@@ -40,14 +40,14 @@ export default function HowItWorksSection() {
   const isInView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 relative" ref={ref}>
+    <section id="how-it-works" className="py-16 md:py-20 px-4 sm:px-6 relative" ref={ref}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="text-center mb-20"
+          className="text-center mb-12"
         >
           <span className="text-primary-400 text-xs font-serif tracking-[0.3em] uppercase mb-4 block">
             Simple Process
@@ -117,7 +117,7 @@ export default function HowItWorksSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center mt-16"
+          className="text-center mt-10"
         >
           <a href="/register" className="btn-primary inline-flex items-center gap-2">
             Begin Your Assessment

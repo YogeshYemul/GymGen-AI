@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
-  { href: "#pricing", label: "Pricing" },
 ];
 
 export default function Navbar() {
@@ -16,8 +15,12 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -25,79 +28,63 @@ export default function Navbar() {
     <motion.nav
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      transition={{ duration: 0.5 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-black/80 backdrop-blur-xl border-b border-white/5 py-3"
-          : "bg-transparent py-3"
+          ? "bg-black/70 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+          : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 md:h-[72px] flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-8 h-8 flex items-center justify-center">
-            <div className="absolute inset-0 bg-primary-400 rounded-sm rotate-45 group-hover:rotate-[60deg] transition-transform duration-300" />
+            <div className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm transition-transform duration-300 group-hover:rotate-[60deg]" />
             <Zap size={16} className="relative z-10 text-black fill-black" />
           </div>
-          <span className="font-serif font-bold text-xl tracking-tight">
+
+          <span className="font-serif font-bold text-xl md:text-2xl">
             Gym<span className="text-primary-400">Gen</span>
-            <span className="text-white/40 text-sm font-light ml-1">AI</span>
+            <span className="text-white/40 text-sm ml-1">AI</span>
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm text-white/60 hover:text-white font-serif transition-colors duration-200 relative group"
+              className="relative text-sm font-medium text-white/60 hover:text-primary-400 transition-all duration-300 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-primary-400 after:transition-all after:duration-300 hover:after:w-full"
             >
               {link.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary-400 group-hover:w-full transition-all duration-300" />
             </Link>
           ))}
         </div>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="btn-secondary text-sm py-2 px-5">
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            href="/login"
+            className="btn-secondary text-sm py-2 px-5"
+          >
             Sign In
           </Link>
-          <Link href="/register" className="btn-primary text-sm py-2 px-5">
+
+          <Link
+            href="/register"
+            className="btn-primary text-sm py-2 px-5"
+          >
             Start Free
           </Link>
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden relative z-50 w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
-          aria-label="Toggle menu"
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-white/10 text-white hover:border-primary-400/40 transition-all"
         >
-          <AnimatePresence mode="wait">
-            {isOpen ? (
-              <motion.div
-                key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <X size={22} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="menu"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Menu size={22} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {isOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
@@ -108,47 +95,38 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden overflow-hidden bg-black/95 backdrop-blur-xl border-b border-white/5"
+            transition={{ duration: 0.25 }}
+            className="md:hidden overflow-hidden bg-black/95 backdrop-blur-2xl border-t border-white/5"
           >
-            <div className="px-4 pt-4 pb-8 flex flex-col gap-2">
-              {navLinks.map((link, i) => (
-                <motion.div
+            <div className="px-5 py-6 flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <Link
                   key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.07 }}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-white/70 hover:text-primary-400 transition-colors text-base"
                 >
-                  <Link
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="block py-3 px-2 text-white/70 hover:text-white font-serif text-base border-b border-white/5 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
+                  {link.label}
+                </Link>
               ))}
-              <motion.div
-                className="flex flex-col gap-3 mt-4"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+
+              <div className="border-t border-white/10 pt-4 flex flex-col gap-3">
                 <Link
                   href="/login"
                   onClick={() => setIsOpen(false)}
-                  className="btn-secondary text-center text-sm"
+                  className="btn-secondary text-center"
                 >
                   Sign In
                 </Link>
+
                 <Link
                   href="/register"
                   onClick={() => setIsOpen(false)}
-                  className="btn-primary text-center text-sm"
+                  className="btn-primary text-center"
                 >
                   Start Free
                 </Link>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         )}

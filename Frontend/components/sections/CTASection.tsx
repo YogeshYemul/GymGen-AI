@@ -10,7 +10,7 @@ export default function CTASection() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-24 px-4 sm:px-6 relative overflow-hidden" ref={ref}>
+    <section className="py-8 md:py-12 px-4 sm:px-6 relative overflow-hidden" ref={ref}>
       {/* Glow BG */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] rounded-full bg-primary-400/8 blur-[100px]" />
@@ -22,8 +22,7 @@ export default function CTASection() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="max-w-3xl mx-auto text-center"
       >
-        <div className="glass-gold rounded-sm p-10 sm:p-16 relative overflow-hidden">
-          {/* Decorative corner lines */}
+          <div className="glass-gold rounded-xl p-8 md:p-10 relative overflow-hidden">          {/* Decorative corner lines */}
           <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-primary-400/40" />
           <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-primary-400/40" />
           <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-primary-400/40" />
