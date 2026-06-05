@@ -85,8 +85,7 @@ export default function FeaturesSection() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="features" className="py-24 px-4 sm:px-6 relative" ref={ref}>
-      {/* Subtle BG */}
+<section id="features" className="py-10 md:py-16 px-4 sm:px-6 relative" ref={ref}>      {/* Subtle BG */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/20 to-transparent" />
@@ -98,21 +97,20 @@ export default function FeaturesSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
-          <span className="text-primary-400 text-xs font-serif tracking-[0.3em] uppercase mb-4 block">
-            Everything You Need
-          </span>
-          <h2 className="font-serif font-black text-3xl sm:text-5xl text-white leading-tight mb-4">
-            One Platform.
-            <span className="text-gold-gradient"> Infinite</span>
-            <br />
-            Possibilities.
-          </h2>
-          <p className="text-white/40 max-w-md mx-auto font-serif text-sm sm:text-base leading-relaxed">
-            From AI-generated workouts to gamified challenges — GymGen AI has
-            every tool you need to hit your goals faster.
-          </p>
+          <span className="text-primary-400 text-xs tracking-[0.25em] uppercase mb-3 block">
+  All-In-One Fitness Platform
+</span>
+
+<h2 className="font-serif font-black text-2xl sm:text-4xl text-white mb-3">
+  Workouts, Nutrition &
+  <span className="text-gold-gradient"> Progress Tracking</span>
+</h2>
+
+<p className="text-white/50 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+  Everything you need to train smarter, eat better and achieve results faster.
+</p>
         </motion.div>
 
         {/* Feature Grid */}
