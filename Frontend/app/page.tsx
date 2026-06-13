@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/sections/HeroSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
-import PricingSection from "@/components/sections/PricingSection";
+import SocialProofSection from "@/components/sections/SocialProofSection";
 
 export default function HomePage() {
   return (
@@ -12,7 +12,7 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <PricingSection />
+      <SocialProofSection />
       <Footer />
     </main>
   );

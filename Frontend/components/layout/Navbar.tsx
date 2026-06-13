@@ -7,8 +7,7 @@ import { motion } from "framer-motion";
 
 const navLinks = [
   { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "#how-it-works", label: "How It Works" }
 ];
 
 export default function Navbar() {
@@ -28,30 +27,29 @@ export default function Navbar() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
           ? "bg-black/80 backdrop-blur-xl border-b border-white/5 py-4"
-          : "bg-transparent py-6"
+          : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 flex items-center justify-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="relative w-9 h-9 flex items-center justify-center">
             <div className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm group-hover:rotate-[60deg] transition-transform duration-300" />
-            <Zap size={20} className="relative z-10 text-black fill-black" />
+            <Zap size={18} className="relative z-10 text-black fill-black" />
           </div>
-          <span className="font-serif font-black text-2xl tracking-tight">
+          <span className="font-serif font-black text-xl tracking-tight">
             Gym<span className="text-primary-400">Gen</span>
             <span className="text-white/40 text-sm font-light ml-1">AI</span>
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm text-white/60 hover:text-white font-serif transition-colors duration-200 relative group"
+              className="text-sm text-white/60 hover:text-white font-serif transition-colors duration-300"
             >
               {link.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary-400 group-hover:w-full transition-all duration-300" />
             </Link>
           ))}
         </div>

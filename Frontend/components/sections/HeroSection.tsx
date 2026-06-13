@@ -1,138 +1,144 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Sparkles, ChevronDown } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, CheckCircle2 } from "lucide-react";
 
 const rotatingGoals = [
-  "Muscle Gain",
-  "Weight Loss",
   "Fat Burning",
+  "Muscle Gain",
   "Strength",
-  "Endurance",
+  "Athletic Performance",
+];
+
+const trustIndicators = [
+  "AI Workouts",
+  "Nutrition Plans",
+  "Progress Tracking",
+  "24/7 Coaching",
 ];
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [goalIndex, setGoalIndex] = useState(0);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setGoalIndex((prev) => (prev + 1) % rotatingGoals.length);
-    }, 2200);
+    }, 2500);
+
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden pt-32 pb-24 px-4 sm:px-6"
-    >
+    <section className="relative overflow-hidden px-4 pt-20 md:pt-24 pb-8 md:pb-12">
+      {/* Background Glow */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary-400/12 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full bg-primary-400/6 blur-[100px]" />
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(245,197,24,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.5) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
+        <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[400px] h-[400px] md:w-[600px] md:h-[600px] rounded-full bg-primary-400/10 blur-[140px]" />
+
+        <div className="absolute bottom-0 right-1/3 w-[250px] h-[250px] rounded-full bg-primary-400/5 blur-[120px]" />
       </div>
 
-      {[...Array(6)].map((_, i) => (
+      <div className="max-w-5xl mx-auto text-center">
+        {/* Badge */}
         <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-primary-400/40"
-          style={{
-            left: `${15 + i * 15}%`,
-            top: `${20 + (i % 3) * 25}%`,
-          }}
-          animate={{
-            y: [-10, 10, -10],
-            opacity: [0.3, 0.7, 0.3],
-          }}
-          transition={{
-            duration: 3 + i * 0.5,
-            repeat: Infinity,
-            delay: i * 0.4,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-
-      <motion.div style={{ y, opacity }} className="w-full max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="inline-flex items-center gap-2 glass-gold px-4 py-2 rounded-full mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 border border-primary-400/20 bg-primary-400/5 backdrop-blur-sm px-4 py-2 rounded-full mb-6"
         >
-          <Sparkles size={13} className="text-primary-400" />
-          <span className="text-xs text-white/70 font-serif tracking-widest uppercase">
+          <Sparkles size={14} className="text-primary-400" />
+
+          <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/80 font-semibold">
             AI-Powered Fitness Platform
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
         </motion.div>
 
+        {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8 }}
         >
-          <h1 className="font-serif font-black text-5xl sm:text-7xl lg:text-8xl leading-[1.05] tracking-tight mb-4">
-            <span className="text-white">Your AI Coach</span>
-            <br />
-            <span className="text-white/30">Built for</span>
-            <br />
-            <span className="relative inline-block">
+          <h1 className="font-serif font-black leading-[0.95] tracking-tight">
+            <span className="block text-white text-4xl sm:text-5xl lg:text-6xl">
+              Your AI Coach
+            </span>
+
+            <span className="block text-white/20 text-4xl sm:text-5xl lg:text-6xl">
+              Built For
+            </span>
+
+            <div className="h-[55px] sm:h-[70px] lg:h-[85px] flex items-center justify-center overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={rotatingGoals[goalIndex]}
-                  initial={{ y: 40, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -40, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-primary-400 block"
+                  initial={{
+                    opacity: 0,
+                    y: 40,
+                    filter: "blur(6px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -40,
+                    filter: "blur(6px)",
+                  }}
+                  transition={{
+                    duration: 0.45,
+                  }}
+                  className="block text-primary-400 text-3xl sm:text-4xl lg:text-5xl"
                 >
                   {rotatingGoals[goalIndex]}
                 </motion.span>
               </AnimatePresence>
-            </span>
+            </div>
           </h1>
         </motion.div>
 
+        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-white/60 text-base sm:text-xl font-serif max-w-2xl mx-auto mt-6 leading-relaxed"
+          transition={{
+            duration: 0.7,
+            delay: 0.2,
+          }}
+          className="max-w-xl mx-auto text-white/70 text-sm sm:text-base lg:text-lg leading-relaxed mt-2"
         >
-          Generate personalized workout plans, smart AI nutrition, track your
-          progress — powered by intelligence that adapts specifically to you.
+          Train smarter with AI-powered workouts, nutrition plans,
+          and progress tracking tailored to you.
         </motion.p>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30"
-      >
-        <span className="text-xs font-serif tracking-widest uppercase">Scroll</span>
+        {/* Trust Indicators */}
         <motion.div
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            delay: 0.4,
+          }}
+          className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-6"
         >
-          <ChevronDown size={18} />
+          {trustIndicators.map((indicator) => (
+            <div
+              key={indicator}
+              className="flex items-center gap-2 text-white/70"
+            >
+              <CheckCircle2
+                size={14}
+                className="text-primary-400 flex-shrink-0"
+              />
+
+              <span className="text-xs md:text-sm">
+                {indicator}
+              </span>
+            </div>
+          ))}
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
