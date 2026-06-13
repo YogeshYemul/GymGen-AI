@@ -87,9 +87,15 @@ export default function AuthPage() {
         },
       });
       if (error) throw error;
-      toast.success("Account created! Check your email.");
-      router.push("/");
-      router.refresh();
+      await supabase.auth.signInWithPassword({
+  email: data.email,
+  password: data.password,
+});
+
+toast.success("Account created successfully!");
+
+router.push("/");
+router.refresh();
     } catch (error: any) {
       toast.error(error.message || "Signup failed");
     } finally {

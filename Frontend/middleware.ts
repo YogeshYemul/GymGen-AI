@@ -17,22 +17,18 @@ export async function middleware(request: NextRequest) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+          response.cookies.set({
+            name,
+            value,
+            ...options,
           });
-          response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+          response.cookies.set({
+            name,
+            value: "",
+            ...options,
           });
-          response.cookies.set({ name, value: "", ...options });
         },
       },
     }
@@ -42,14 +38,15 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (request.nextUrl.pathname === "/auth") {
-    if (user) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    return response;
+  const isAuthPage = request.nextUrl.pathname === "/auth";
+
+  // If logged in and visiting auth page -> go home
+  if (isAuthPage && user) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!user) {
+  // If not logged in and visiting protected page -> go auth
+  if (!isAuthPage && !user) {
     return NextResponse.redirect(new URL("/auth", request.url));
   }
 
@@ -57,5 +54,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };
