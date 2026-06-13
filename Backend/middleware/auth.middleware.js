@@ -7,7 +7,7 @@ const verifyToken = (req, res, next) => {
     if (!authHeader) {
       return res.status(401).json({
         success: false,
-        message: "Access Denied. No Token Provided",
+        message: "No token provided",
       });
     }
 
@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
     });
   }
 };

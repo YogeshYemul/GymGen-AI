@@ -10,119 +10,100 @@ const steps = [
     icon: ClipboardList,
     title: "Complete Your Assessment",
     description:
-      "Fill in your age, gender, height, weight, fitness goal, experience level, and how many days you can train per week.",
+      "Tell us your age, goals, experience level, and how often you can train.",
   },
   {
     number: "02",
     icon: Cpu,
     title: "AI Builds Your Plan",
     description:
-      "Our AI analyzes your profile and instantly generates a personalized workout split and nutrition plan built for your exact goal.",
+      "Our AI analyzes your profile and creates personalized workout and nutrition plans.",
   },
   {
     number: "03",
     icon: Rocket,
-    title: "Start Training",
+    title: "Start Your Journey",
     description:
-      "Access your workout schedule, exercises, sets, reps, and diet plan. Log your sessions and meals daily.",
+      "Follow your schedule, log your sessions, and stay consistent with reminders.",
   },
   {
     number: "04",
     icon: BarChart,
     title: "Track & Evolve",
     description:
-      "Monitor your progress through charts, streaks, and analytics. Your plan adapts as you grow stronger.",
+      "Monitor your progress with charts, and watch your plans adapt as you improve.",
   },
 ];
 
 export default function HowItWorksSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="how-it-works" className="py-16 md:py-20 px-4 sm:px-6 relative" ref={ref}>
+    <section id="how-it-works" className="py-20 px-4 sm:px-6 relative" ref={ref}>
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/20 to-transparent" />
+      </div>
+
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <span className="text-primary-400 text-xs font-serif tracking-[0.3em] uppercase mb-4 block">
             Simple Process
           </span>
           <h2 className="font-serif font-black text-3xl sm:text-5xl text-white leading-tight">
-            From Zero to{" "}
-            <span className="text-gold-gradient">Elite</span>
+            From Zero to <span className="text-primary-400">Elite</span>
             <br />
             in 4 Steps
           </h2>
         </motion.div>
 
-        {/* Steps */}
-        <div className="relative">
-          {/* Connecting line - desktop */}
-          <div className="hidden lg:block absolute top-16 left-0 right-0 h-px">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {steps.map((step, i) => (
             <motion.div
-              initial={{ scaleX: 0 }}
-              animate={isInView ? { scaleX: 1 } : {}}
-              transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="h-full origin-left"
-              style={{
-                background:
-                  "linear-gradient(to right, rgba(245,197,24,0.3), rgba(245,197,24,0.1), rgba(245,197,24,0.3))",
-              }}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, i) => (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.7, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex flex-col items-center text-center"
-              >
-                {/* Number circle */}
-                <div className="relative mb-6">
+              key={step.number}
+              initial={{ opacity: 0, y: 40 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative"
+            >
+              <div className="relative mb-6">
+                <div className="w-16 h-16 relative z-10 flex items-center justify-center mx-auto">
                   <motion.div
                     initial={{ scale: 0, rotate: -45 }}
                     animate={isInView ? { scale: 1, rotate: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.3 + i * 0.15, type: "spring" }}
-                    className="w-16 h-16 relative z-10 flex items-center justify-center"
-                  >
-                    <div className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm" />
-                    <step.icon size={22} className="relative z-10 text-black" />
-                  </motion.div>
-                  <div className="absolute -top-2 -right-2 text-xs font-serif font-black text-primary-400/40">
-                    {step.number}
-                  </div>
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.2 + i * 0.15,
+                      type: "spring",
+                    }}
+                    className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm group-hover:shadow-[0_0_30px_rgba(245,197,24,0.4)] transition-shadow"
+                  />
+                  <step.icon
+                    size={24}
+                    className="relative z-10 text-black"
+                  />
                 </div>
+                <div className="absolute -top-3 -right-1/2 translate-x-1/2 text-xs font-serif font-black text-primary-400/30">
+                  {step.number}
+                </div>
+              </div>
 
-                <h3 className="font-serif font-bold text-white text-lg mb-3 leading-tight">
+              <div className="text-center">
+                <h3 className="font-serif font-bold text-xl text-white mb-3 group-hover:text-primary-300 transition-colors">
                   {step.title}
                 </h3>
-                <p className="text-white/40 text-sm font-serif leading-relaxed">
+                <p className="text-white/50 text-sm font-serif leading-relaxed">
                   {step.description}
                 </p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center mt-10"
-        >
-          <a href="/register" className="btn-primary inline-flex items-center gap-2">
-            Begin Your Assessment
-          </a>
-        </motion.div>
       </div>
     </section>
   );
