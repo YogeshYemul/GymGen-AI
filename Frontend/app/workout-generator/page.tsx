@@ -54,6 +54,7 @@ export default function WorkoutGeneratorPage() {
         throw new Error(data.error?.message || data.error || "Failed to generate plan");
       }
       localStorage.setItem("workoutPlan", data.workout);
+      localStorage.setItem("workoutFormData", JSON.stringify(formData));
       window.location.href = "/workout-generator/result";
     } catch (error) {
       console.error(error);
