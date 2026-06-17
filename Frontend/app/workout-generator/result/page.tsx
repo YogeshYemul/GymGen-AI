@@ -2,18 +2,14 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Download,
   Dumbbell,
   Flame,
   TrendingUp,
-  Calendar,
-  Clock,
-  Trophy,
-  ChevronDown,
-  ChevronUp
+  Calendar
 } from "lucide-react";
 
 interface Exercise {
@@ -42,6 +38,18 @@ interface ParsedWorkout {
   warmUp: string[];
   coolDown: string[];
   tips: string[];
+}
+
+interface FormData {
+  gender: string;
+  age: string;
+  height: string;
+  weight: string;
+  goal: string;
+  experience: string;
+  workoutDays: string;
+  equipment: string;
+  duration: string;
 }
 
 function parseMarkdownToWorkout(markdown: string): ParsedWorkout {
@@ -77,7 +85,7 @@ function parseMarkdownToWorkout(markdown: string): ParsedWorkout {
       let dayTitle = line.replace(/##?\s*/, "");
       const dayMatch = dayTitle.match(/Day\s*\d+/i);
       let dayName = dayMatch ? dayMatch[0] : `Day ${result.days.length + 1}`;
-      let target = dayTitle.replace(dayName, "").trim().replace(/^[:-]\s*/, "");
+      let target = dayTitle.replace(dayName, "").trim().replace(/^[:\-–\s]*/, "");
       currentDay = {
         day: dayName,
         title: target || "Workout",
@@ -96,16 +104,16 @@ function parseMarkdownToWorkout(markdown: string): ParsedWorkout {
     }
 
     if (currentSection === "warmup" && line) {
-      let item = line.replace(/^[-*]\s*/, "").replace(/^\d+\.\s*/, "");
+      let item = line.replace(/^[\-\*\•]\s*/, "").replace(/^\d+\.\s*/, "");
       if (item) result.warmUp.push(item);
     } else if (currentSection === "cooldown" && line) {
-      let item = line.replace(/^[-*]\s*/, "").replace(/^\d+\.\s*/, "");
+      let item = line.replace(/^[\-\*\•]\s*/, "").replace(/^\d+\.\s*/, "");
       if (item) result.coolDown.push(item);
     } else if (currentSection === "tips" && line) {
-      let item = line.replace(/^[-*]\s*/, "").replace(/^\d+\.\s*/, "").replace(/^✓\s*/, "");
+      let item = line.replace(/^[\-\*\•]\s*/, "").replace(/^\d+\.\s*/, "").replace(/^✓\s*/, "");
       if (item) result.tips.push(item);
     } else if (currentSection === "day" && currentDay) {
-      if (line.match(/^\d+\.\s*/) || line.toLowerCase().includes("sets:")) {
+      if (line.match(/^\d+\.\s*/) || (line.toLowerCase().includes("sets:") && i > 0 && currentDay.exercises.length > 0)) {
         let exerciseName = line.replace(/^\d+\.\s*/, "").trim();
         let sets = "3";
         let reps = "10-12";
@@ -132,23 +140,45 @@ function parseMarkdownToWorkout(markdown: string): ParsedWorkout {
   return result;
 }
 
-interface FormData {
-  gender: string;
-  age: string;
-  height: string;
-  weight: string;
-  goal: string;
-  experience: string;
-  workoutDays: string;
-  equipment: string;
-  duration: string;
+function roundToNearest(value: number): number {
+  const remainder = value % 2.5;
+  if (remainder < 1.25) {
+    return value - remainder;
+  }
+  return value + (2.5 - remainder);
+}
+
+function estimateWeight(exerciseName: string, formData: FormData | null): string {
+  if (!formData) return "Estimate";
+  const weightKg = parseFloat(formData.weight) || 70;
+  let baseMultiplier = 0.3;
+  if (formData.experience === "Beginner") baseMultiplier = 0.25;
+  if (formData.experience === "Intermediate") baseMultiplier = 0.4;
+  if (formData.experience === "Advanced") baseMultiplier = 0.6;
+
+  if (formData.goal === "Muscle Gain") baseMultiplier *= 1.1;
+  if (formData.goal === "Strength") baseMultiplier *= 1.25;
+  if (formData.goal === "Fat Loss") baseMultiplier *= 0.9;
+
+  const lowerBodyWords = ["squat", "deadlift", "lunge", "leg press"];
+  const upperBodyWords = ["bench", "press", "pull", "row"];
+
+  const nameLower = exerciseName.toLowerCase();
+  let estimatedWeight;
+  if (lowerBodyWords.some(w => nameLower.includes(w))) {
+    estimatedWeight = weightKg * baseMultiplier * 1.4;
+  } else if (upperBodyWords.some(w => nameLower.includes(w))) {
+    estimatedWeight = weightKg * baseMultiplier * 0.8;
+  } else {
+    estimatedWeight = weightKg * baseMultiplier * 0.5;
+  }
+  return `${roundToNearest(estimatedWeight)}`;
 }
 
 export default function WorkoutResultPage() {
   const [workoutPlan, setWorkoutPlan] = useState<string>("");
   const [parsedData, setParsedData] = useState<ParsedWorkout | null>(null);
   const [formData, setFormData] = useState<FormData | null>(null);
-  const [expandedDay, setExpandedDay] = useState<number>(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -190,7 +220,7 @@ export default function WorkoutResultPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
+          className="mb-12"
         >
           <div className="inline-flex items-center gap-2 bg-primary-400/10 border border-primary-400/20 rounded-full px-4 py-2 mb-6">
             <Dumbbell size={16} className="text-primary-400" />
@@ -204,9 +234,43 @@ export default function WorkoutResultPage() {
             <span className="block text-primary-400">Workout Plan</span>
           </h1>
 
-          <p className="text-white/60">
-            Generated by GymGen AI, based on your fitness profile.
+          <p className="text-white/60 mb-8">
+            Generated by GymGen AI using Groq, based on your fitness profile.
           </p>
+
+          {formData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4"
+            >
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Gender</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.gender}</div>
+              </div>
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Age</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.age}</div>
+              </div>
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Height</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.height} cm</div>
+              </div>
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Weight</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.weight} kg</div>
+              </div>
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Goal</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.goal}</div>
+              </div>
+              <div className="bg-white/[0.015] border border-primary-400/15 rounded-xl p-3 md:p-4 text-center">
+                <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mb-1">Experience</div>
+                <div className="text-sm md:text-lg font-semibold">{formData.experience}</div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {parsedData ? (
@@ -215,32 +279,88 @@ export default function WorkoutResultPage() {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mb-12"
+                transition={{ delay: 0.2 }}
+                className="mb-16"
               >
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
                   <Calendar className="text-primary-400" size={24} />
-                  Weekly Timeline
+                  Weekly Schedule
                 </h2>
-                <div className="flex flex-col md:flex-row gap-3 md:gap-6">
+
+                <div className="space-y-10">
                   {parsedData.days.map((day, idx) => (
                     <motion.div
                       key={idx}
-                      initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.35 + idx * 0.07 }}
-                      onClick={() => setExpandedDay(idx)}
-                      className={`cursor-pointer px-5 py-4 rounded-2xl border transition-all ${
-                        expandedDay === idx
-                          ? "bg-primary-400/20 border-primary-400"
-                          : "bg-white/[0.02] border-white/10 hover:border-primary-400/30"
-                      }`}
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25 + idx * 0.1 }}
+                      className="bg-white/[0.015] border border-white/8 rounded-2xl overflow-hidden"
                     >
-                      <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-1">
-                        {day.day}
+                      <div className="px-6 py-5 border-b border-white/5 bg-white/[0.02]">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                          <div>
+                            <div className="text-xs text-primary-400 font-black uppercase tracking-[0.22em] mb-1">
+                              {day.day}
+                            </div>
+                            <div className="text-xl md:text-2xl font-bold">
+                              {day.title}
+                            </div>
+                          </div>
+                          {day.targetMuscles && (
+                            <div className="flex items-center gap-2 text-white/60 text-sm md:text-base">
+                              <Dumbbell size={16} className="text-primary-400/70" />
+                              <span>Target: {day.targetMuscles}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="font-bold">
-                        {day.title}
+
+                      <div className="overflow-hidden">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="bg-primary-400/10 border-y border-primary-400/20">
+                              <th className="py-3 px-3 md:py-4 md:px-6 text-[10px] md:text-sm font-bold text-primary-400 uppercase tracking-wider w-2/5 md:w-auto">
+                                Exercise
+                              </th>
+                              <th className="py-3 px-2 md:py-4 md:px-4 text-[10px] md:text-sm font-bold text-primary-400 uppercase tracking-wider w-auto md:w-1/6 text-center">
+                                Sets
+                              </th>
+                              <th className="py-3 px-2 md:py-4 md:px-4 text-[10px] md:text-sm font-bold text-primary-400 uppercase tracking-wider w-auto md:w-1/6 text-center">
+                                Reps
+                              </th>
+                              <th className="py-3 px-2 md:py-4 md:px-4 text-[10px] md:text-sm font-bold text-primary-400 uppercase tracking-wider w-auto md:w-1/6 text-center">
+                                Weight
+                              </th>
+                              <th className="py-3 px-2 md:py-4 md:px-4 text-[10px] md:text-sm font-bold text-primary-400 uppercase tracking-wider w-auto md:w-1/6 text-center">
+                                Rest
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {day.exercises.map((exercise, eIdx) => (
+                              <tr
+                                key={eIdx}
+                                className={`border-b border-white/5 ${eIdx % 2 === 0 ? "bg-transparent" : "bg-white/[0.015]"} hover:bg-white/[0.035] transition-colors`}
+                              >
+                                <td className="py-2.5 px-3 md:py-4 md:px-6 font-medium text-xs md:text-base">
+                                  {exercise.name}
+                                </td>
+                                <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
+                                  {exercise.sets}
+                                </td>
+                                <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
+                                  {exercise.reps}
+                                </td>
+                                <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
+                                  {estimateWeight(exercise.name, formData)}
+                                </td>
+                                <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
+                                  {exercise.rest}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </motion.div>
                   ))}
@@ -248,92 +368,15 @@ export default function WorkoutResultPage() {
               </motion.div>
             )}
 
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Dumbbell className="text-primary-400" size={24} />
-                Weekly Split
-              </h2>
-              <div className="space-y-5">
-                {parsedData.days.map((day, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + idx * 0.08 }}
-                    whileHover={{ y: -4 }}
-                    className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden hover:border-primary-400/40 transition-all"
-                  >
-                    <div
-                      className="px-6 py-4 cursor-pointer flex items-center justify-between"
-                      onClick={() => setExpandedDay(expandedDay === idx ? -1 : idx)}
-                    >
-                      <div>
-                        <div className="text-xs text-primary-400 uppercase tracking-widest font-bold mb-1">
-                          {day.day}
-                        </div>
-                        <div className="text-xl font-bold">{day.title}</div>
-                        {day.targetMuscles && (
-                          <div className="text-white/60 text-sm mt-1">
-                            Target: {day.targetMuscles}
-                          </div>
-                        )}
-                      </div>
-                      {expandedDay === idx ? (
-                        <ChevronUp size={20} className="text-primary-400" />
-                      ) : (
-                        <ChevronDown size={20} className="text-white/50" />
-                      )}
-                    </div>
-                    <AnimatePresence>
-                      {expandedDay === idx && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-6 pb-6">
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-left border-collapse">
-                                <thead>
-                                  <tr className="border-b border-white/10">
-                                    <th className="py-3 px-4 text-sm font-semibold text-primary-400">Exercise</th>
-                                    <th className="py-3 px-4 text-sm font-semibold text-primary-400">Sets</th>
-                                    <th className="py-3 px-4 text-sm font-semibold text-primary-400">Reps</th>
-                                    <th className="py-3 px-4 text-sm font-semibold text-primary-400">Rest</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {day.exercises.map((exercise, eIdx) => (
-                                    <tr key={eIdx} className="border-b border-white/5 hover:bg-white/[0.03]">
-                                      <td className="py-3 px-4">{exercise.name}</td>
-                                      <td className="py-3 px-4">{exercise.sets}</td>
-                                      <td className="py-3 px-4">{exercise.reps}</td>
-                                      <td className="py-3 px-4">{exercise.rest}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
             <div className="grid md:grid-cols-2 gap-6 mb-12">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.7 }}
-                whileHover={{ y: -3, boxShadow: "0 0 30px rgba(245,197,24,0.12)" }}
-                className="bg-white/[0.02] border border-primary-400/30 rounded-2xl p-6 backdrop-blur-sm"
+                transition={{ delay: 0.8 }}
+                className="bg-white/[0.015] border border-primary-400/20 rounded-2xl p-6 backdrop-blur-sm"
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-primary-400/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary-400/10 rounded-xl flex items-center justify-center">
                     <Flame size={24} className="text-primary-400" />
                   </div>
                   <h3 className="text-xl font-bold">Warm Up</h3>
@@ -355,12 +398,11 @@ export default function WorkoutResultPage() {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.75 }}
-                whileHover={{ y: -3, boxShadow: "0 0 30px rgba(245,197,24,0.12)" }}
-                className="bg-white/[0.02] border border-primary-400/30 rounded-2xl p-6 backdrop-blur-sm"
+                transition={{ delay: 0.85 }}
+                className="bg-white/[0.015] border border-primary-400/20 rounded-2xl p-6 backdrop-blur-sm"
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-primary-400/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary-400/10 rounded-xl flex items-center justify-center">
                     <TrendingUp size={24} className="text-primary-400" />
                   </div>
                   <h3 className="text-xl font-bold">Progression Tips</h3>
@@ -394,6 +436,30 @@ export default function WorkoutResultPage() {
                 </ul>
               </motion.div>
             </div>
+
+            {parsedData.coolDown.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="mb-12 bg-white/[0.015] border border-primary-400/15 rounded-2xl p-6 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-primary-400/10 rounded-xl flex items-center justify-center">
+                    <TrendingUp size={24} className="text-primary-400" />
+                  </div>
+                  <h3 className="text-xl font-bold">Cool Down</h3>
+                </div>
+                <ul className="space-y-3">
+                  {parsedData.coolDown.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full border border-primary-400/40 mt-0.5 flex-shrink-0" />
+                      <span className="text-white/70">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
           </>
         ) : (
           <div className="bg-white/[0.02] border border-primary-400/20 rounded-3xl p-10 text-center">
