@@ -17,6 +17,7 @@ interface Exercise {
   sets: string;
   reps: string;
   rest: string;
+  weight?: string;
 }
 
 interface WorkoutDay {
@@ -113,25 +114,35 @@ function parseMarkdownToWorkout(markdown: string): ParsedWorkout {
       let item = line.replace(/^[\-\*\•]\s*/, "").replace(/^\d+\.\s*/, "").replace(/^✓\s*/, "");
       if (item) result.tips.push(item);
     } else if (currentSection === "day" && currentDay) {
-      if (line.match(/^\d+\.\s*/) || (line.toLowerCase().includes("sets:") && i > 0 && currentDay.exercises.length > 0)) {
+      if (line.match(/^\d+\.\s*/)) {
         let exerciseName = line.replace(/^\d+\.\s*/, "").trim();
         let sets = "3";
         let reps = "10-12";
         let rest = "60s";
-        if (i + 1 < lines.length && lines[i+1].toLowerCase().startsWith("sets:")) {
-          sets = lines[i+1].replace(/sets:\s*/i, "").trim();
+        let weight = "Estimate";
+        
+        let j = i + 1;
+        while (j < lines.length && (
+          lines[j].toLowerCase().startsWith("sets:") || 
+          lines[j].toLowerCase().startsWith("reps:") || 
+          lines[j].toLowerCase().startsWith("rest:") || 
+          lines[j].toLowerCase().startsWith("weight:")
+        )) {
+          if (lines[j].toLowerCase().startsWith("sets:")) {
+            sets = lines[j].replace(/sets:\s*/i, "").trim();
+          } else if (lines[j].toLowerCase().startsWith("reps:")) {
+            reps = lines[j].replace(/reps:\s*/i, "").trim();
+          } else if (lines[j].toLowerCase().startsWith("rest:")) {
+            rest = lines[j].replace(/rest:\s*/i, "").trim();
+          } else if (lines[j].toLowerCase().startsWith("weight:")) {
+            weight = lines[j].replace(/weight:\s*/i, "").trim();
+          }
+          j++;
           i++;
         }
-        if (i + 1 < lines.length && lines[i+1].toLowerCase().startsWith("reps:")) {
-          reps = lines[i+1].replace(/reps:\s*/i, "").trim();
-          i++;
-        }
-        if (i + 1 < lines.length && lines[i+1].toLowerCase().startsWith("rest:")) {
-          rest = lines[i+1].replace(/rest:\s*/i, "").trim();
-          i++;
-        }
+        
         if (exerciseName && exerciseName.length > 1) {
-          currentDay.exercises.push({ name: exerciseName, sets, reps, rest });
+          currentDay.exercises.push({ name: exerciseName, sets, reps, rest, weight });
         }
       }
     }
@@ -352,8 +363,8 @@ export default function WorkoutResultPage() {
                                   {exercise.reps}
                                 </td>
                                 <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
-                                  {estimateWeight(exercise.name, formData)}
-                                </td>
+                  {exercise.weight || "Estimate"}
+                </td>
                                 <td className="py-2.5 px-2 md:py-4 md:px-4 text-center text-white/85 text-xs md:text-base">
                                   {exercise.rest}
                                 </td>

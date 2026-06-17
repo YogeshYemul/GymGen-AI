@@ -1,372 +1,280 @@
 import { NextResponse } from "next/server";
 
+// Exercise Database
+const EXERCISE_DATABASE = {
+  bodyweight: {
+    upperPush: ["Push-ups", "Incline Push-ups", "Decline Push-ups", "Diamond Push-ups", "Pike Push-ups", "Dips (if possible)"],
+    upperPull: ["Pull-ups", "Chin-ups", "Inverted Rows", "Australian Pull-ups", "Face Pulls (using door)", "Bicep Curls (water bottles)"],
+    lower: ["Bodyweight Squats", "Lunges", "Bulgarian Split Squats", "Glute Bridges", "Hip Thrusts", "Calf Raises", "Pistol Squats (progression)"],
+    core: ["Plank", "Side Plank", "Hanging Leg Raises", "Russian Twists", "Mountain Climbers"],
+    fullBody: ["Burpees", "Jumping Jacks", "High Knees", "Squat Jumps", "Box Jumps (if available)"]
+  },
+  dumbbells: {
+    upperPush: ["Dumbbell Bench Press", "Incline Dumbbell Press", "Overhead Press", "Lateral Raises", "Front Raises", "Tricep Extensions"],
+    upperPull: ["Dumbbell Rows", "Bent Over Rows", "Pull-ups (assisted if needed)", "Face Pulls", "Dumbbell Bicep Curls", "Hammer Curls"],
+    lower: ["Dumbbell Squats", "Dumbbell Lunges", "Romanian Deadlifts", "Dumbbell Hip Thrusts", "Calf Raises", "Step-ups"],
+    core: ["Weighted Plank", "Russian Twists (with weight)", "Dumbbell Crunches", "Leg Raises"],
+    fullBody: ["Dumbbell Swings", "Dumbbell Thrusters", "Goblet Squats", "Farmer's Carry"]
+  },
+  homeGym: {
+    upperPush: ["Bench Press", "Overhead Press", "Incline Press", "Tricep Dips", "Lateral Raises"],
+    upperPull: ["Pull-ups (machine)", "Lat Pulldown", "Cable Rows", "Bicep Curls", "Face Pulls"],
+    lower: ["Squats (rack)", "Romanian Deadlifts", "Leg Press", "Leg Extensions", "Leg Curls", "Calf Raises"],
+    core: ["Hanging Leg Raises", "Cable Crunches", "Plank", "Ab Wheel Rollouts"],
+    fullBody: ["Kettlebell Swings", "Deadlifts (light)", "Thrusters"]
+  },
+  fullGym: {
+    upperPush: ["Barbell Bench Press", "Incline Barbell Press", "Overhead Press", "Dumbbell Flyes", "Cable Crossovers", "Tricep Pushdowns", "Skull Crushers"],
+    upperPull: ["Pull-ups", "Lat Pulldowns", "Barbell Rows", "T-bar Rows", "Face Pulls", "Dumbbell Curls", "Hammer Curls"],
+    lower: ["Back Squats", "Front Squats", "Deadlifts", "Romanian Deadlifts", "Leg Press", "Leg Extensions", "Leg Curls", "Calf Raises"],
+    core: ["Hanging Leg Raises", "Cable Crunches", "Weighted Plank", "Ab Wheel", "Wood Chops"],
+    fullBody: ["Power Cleans", "Kettlebell Swings", "Thrusters", "Farmer's Carry", "Sled Push/Pull"]
+  }
+};
+
+// Personalization Functions
+function selectSplit(days: number, experience: string) {
+  if (experience === "Advanced" && days >= 5) {
+    return "bro"; // One muscle group per day for advanced
+  }
+  
+  switch(days) {
+    case 1:
+    case 2:
+      return "fullBody";
+    case 3:
+      return "pushPullLegs";
+    case 4:
+      return "upperLower";
+    case 5:
+      return "pushPullLegsUpperLower";
+    case 6:
+      return "pushPullLegsPushPullLegs";
+    default:
+      return "fullBody";
+  }
+}
+
+function getExercisesForSplit(split: string, day: number, equipment: string, goal: string, experience: string) {
+  const db = EXERCISE_DATABASE[equipment as keyof typeof EXERCISE_DATABASE] || EXERCISE_DATABASE.bodyweight;
+  
+  switch(split) {
+    case "fullBody":
+      return {
+        title: "Full Body Workout",
+        targetMuscles: "Chest, Back, Shoulders, Legs, Arms",
+        exercises: [
+          ...db.upperPush.slice(0,2),
+          ...db.upperPull.slice(0,2),
+          ...db.lower.slice(0,3),
+          ...db.core.slice(0,1)
+        ]
+      };
+    case "pushPullLegs":
+      const pplDays = [
+        { title: "Push Day", targetMuscles: "Chest, Shoulders, Triceps", exercises: [...db.upperPush, ...db.core.slice(0,1)] },
+        { title: "Pull Day", targetMuscles: "Back, Biceps, Rear Delts", exercises: [...db.upperPull, ...db.core.slice(0,1)] },
+        { title: "Leg Day", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: [...db.lower, ...db.core.slice(0,1)] }
+      ];
+      return pplDays[(day-1) % 3];
+    case "upperLower":
+      const ulDays = [
+        { title: "Upper Day", targetMuscles: "Chest, Back, Shoulders, Arms", exercises: [...db.upperPush, ...db.upperPull] },
+        { title: "Lower Day", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: [...db.lower, ...db.core] },
+        { title: "Upper Day 2", targetMuscles: "Chest, Back, Shoulders, Arms", exercises: [...db.upperPull, ...db.upperPush.slice().reverse()] },
+        { title: "Lower Day 2", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: [...db.lower.slice().reverse(), ...db.core] }
+      ];
+      return ulDays[(day-1) % 4];
+    case "pushPullLegsUpperLower":
+      const full5Days = [
+        { title: "Push Day", targetMuscles: "Chest, Shoulders, Triceps", exercises: [...db.upperPush, ...db.core.slice(0,1)] },
+        { title: "Pull Day", targetMuscles: "Back, Biceps, Rear Delts", exercises: [...db.upperPull, ...db.core.slice(0,1)] },
+        { title: "Leg Day", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: [...db.lower, ...db.core.slice(0,1)] },
+        { title: "Upper Day", targetMuscles: "Chest, Back, Shoulders, Arms", exercises: [...db.upperPush.slice(0,3), ...db.upperPull.slice(0,3)] },
+        { title: "Lower Day", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: [...db.lower.slice(0,5), ...db.core] }
+      ];
+      return full5Days[day-1];
+    case "pushPullLegsPushPullLegs":
+      const pplDays2 = [
+        { title: "Push Day 1", targetMuscles: "Chest, Shoulders, Triceps", exercises: db.upperPush },
+        { title: "Pull Day 1", targetMuscles: "Back, Biceps, Rear Delts", exercises: db.upperPull },
+        { title: "Leg Day 1", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: db.lower },
+        { title: "Push Day 2", targetMuscles: "Chest, Shoulders, Triceps", exercises: db.upperPush.slice().reverse() },
+        { title: "Pull Day 2", targetMuscles: "Back, Biceps, Rear Delts", exercises: db.upperPull.slice().reverse() },
+        { title: "Leg Day 2", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: db.lower.slice().reverse() }
+      ];
+      return pplDays2[day-1];
+    case "bro":
+      const broDays = [
+        { title: "Chest Day", targetMuscles: "Chest, Triceps", exercises: [...db.upperPush.slice(0,5), ...db.core.slice(0,1)] },
+        { title: "Back Day", targetMuscles: "Back, Biceps", exercises: [...db.upperPull.slice(0,5), ...db.core.slice(0,1)] },
+        { title: "Shoulders Day", targetMuscles: "Shoulders, Traps", exercises: [...db.upperPush.slice(2,6), ...db.core.slice(0,1)] },
+        { title: "Leg Day", targetMuscles: "Quads, Glutes, Hamstrings, Calves", exercises: db.lower },
+        { title: "Arms Day", targetMuscles: "Biceps, Triceps, Forearms", exercises: [...db.upperPush.slice(4,6), ...db.upperPull.slice(4,6), ...db.core.slice(0,1)] },
+        { title: "Full Body Pump Day", targetMuscles: "Full Body", exercises: [...db.fullBody, ...db.core.slice(0,2)] }
+      ];
+      return broDays[day-1];
+    default:
+      return {
+        title: "Full Body Workout",
+        targetMuscles: "Chest, Back, Shoulders, Legs, Arms",
+        exercises: db.fullBody
+      };
+  }
+}
+
+function getSetsRepsRest(goal: string, experience: string, exerciseIndex: number) {
+  // Goal-based parameters
+  switch(goal) {
+    case "Muscle Gain":
+      return experience === "Beginner" ? 
+        { sets: 3, reps: "10-12", rest: "60s" } : 
+        experience === "Intermediate" ? 
+          { sets: 4, reps: "8-12", rest: "75-90s" } : 
+          { sets: 5, reps: "6-10", rest: "90-120s" };
+    case "Fat Loss":
+      return { sets: 4, reps: "12-15", rest: "30-45s" };
+    case "Strength":
+      return experience === "Beginner" ? 
+        { sets: 4, reps: "5-8", rest: "2-3min" } : 
+        { sets: 5, reps: "3-6", rest: "3-5min" };
+    case "Athletic Performance":
+      return { sets: 4, reps: "8-10", rest: "60-90s" };
+    default:
+      return { sets: 3, reps: "10-12", rest: "60s" };
+  }
+}
+
+function estimateWeight(exerciseName: string, userWeightKg: number, experience: string, goal: string, equipment: string) {
+  let multiplier = 0.3;
+  
+  if (experience === "Beginner") multiplier = 0.2;
+  if (experience === "Intermediate") multiplier = 0.35;
+  if (experience === "Advanced") multiplier = 0.5;
+
+  if (goal === "Strength") multiplier *= 1.3;
+  if (goal === "Muscle Gain") multiplier *= 1.1;
+  if (goal === "Fat Loss") multiplier *= 0.8;
+
+  if (equipment === "Bodyweight") return "Bodyweight";
+  if (equipment === "Dumbbells") multiplier *= 0.5; // Each dumbbell
+
+  const lowerBody = ["squat", "deadlift", "lunge", "leg press", "hip thrust"];
+  const upperBody = ["bench", "press", "row", "pull"];
+
+  const nameLower = exerciseName.toLowerCase();
+  let estimated;
+  if (lowerBody.some(w => nameLower.includes(w))) {
+    estimated = userWeightKg * multiplier * 1.4;
+  } else if (upperBody.some(w => nameLower.includes(w))) {
+    estimated = userWeightKg * multiplier * 0.8;
+  } else {
+    estimated = userWeightKg * multiplier * 0.4;
+  }
+
+  // Round to 2.5kg increment
+  const remainder = estimated % 2.5;
+  const rounded = remainder < 1.25 ? estimated - remainder : estimated + (2.5 - remainder);
+  return Math.max(2.5, rounded).toString();
+}
+
+function generatePersonalizedPlan(body: any) {
+  const { gender, age, height, weight, goal, experience, workoutDays, equipment, duration } = body;
+  const days = parseInt(workoutDays);
+  const split = selectSplit(days, experience);
+  const weightKg = parseFloat(weight);
+  
+  // Map user input to our database keys
+  let normalizedEquipment = equipment.toLowerCase();
+  if (normalizedEquipment === "gym" || normalizedEquipment === "full gym") normalizedEquipment = "fullGym";
+  if (normalizedEquipment === "home gym" || normalizedEquipment === "homegym") normalizedEquipment = "homeGym";
+  if (!EXERCISE_DATABASE[normalizedEquipment as keyof typeof EXERCISE_DATABASE]) {
+    normalizedEquipment = "bodyweight"; // Fallback
+  }
+  
+  let plan = `# Weekly Workout Plan (GymGen AI)
+
+Goal: ${goal}
+Experience: ${experience}
+Equipment: ${equipment}
+Workout Days/Week: ${workoutDays}
+Duration per Workout: ${duration} min
+
+`;
+
+  // Generate each workout day
+  for (let d = 1; d <= days; d++) {
+    const dayPlan = getExercisesForSplit(split, d, normalizedEquipment, goal, experience);
+    plan += `## Day ${d} - ${dayPlan.title}
+Target Muscles: ${dayPlan.targetMuscles}
+
+Exercises:
+`;
+
+    // Add exercises (adjust number based on duration)
+    let numExercises;
+    const durationMinutes = parseInt(duration);
+    switch(durationMinutes) {
+      case 30: numExercises = Math.min(4, dayPlan.exercises.length); break;
+      case 45: numExercises = Math.min(6, dayPlan.exercises.length); break;
+      case 60: numExercises = Math.min(8, dayPlan.exercises.length); break;
+      default: numExercises = dayPlan.exercises.length;
+    }
+
+    for (let i = 0; i < numExercises; i++) {
+      const ex = dayPlan.exercises[i];
+      const srr = getSetsRepsRest(goal, experience, i);
+      const w = estimateWeight(ex, weightKg, experience, goal, normalizedEquipment);
+      plan += `${i+1}. ${ex}
+Sets: ${srr.sets}
+Reps: ${srr.reps}
+Rest: ${srr.rest}
+Weight: ${w}
+
+`;
+    }
+  }
+
+  // Warm Up
+  plan += `## Warm Up
+- 5-10 minutes light cardio (jumping jacks, jogging, rowing)
+- Dynamic stretches (arm circles, leg swings, torso twists)
+- Light 2 sets of the first exercise of the day to warm up muscles
+- Foam rolling (if available)
+`;
+
+  // Cool Down
+  plan += `## Cool Down
+- Static stretches (30-60 seconds per stretch) for all worked muscles
+- Deep breathing for 2 minutes to lower heart rate
+- 5-minute slow walk
+- Foam rolling (if available)
+`;
+
+  // Progression Tips
+  let tips = "- Track every workout in a notebook or app to ensure consistent progress\n";
+  if (goal === "Muscle Gain") tips += "- Focus on progressive overload by adding weight when you can complete the top of the rep range for all sets\n";
+  if (goal === "Fat Loss") tips += "- Maintain a slight calorie deficit and prioritize protein intake to preserve muscle\n";
+  if (goal === "Strength") tips += "- Prioritize compound lifts and give yourself enough rest between heavy sets\n";
+  tips += "- Ensure 7-9 hours of sleep per night for optimal recovery and muscle growth\n";
+  tips += "- Stay hydrated throughout the day and especially during workouts\n";
+  tips += "- Every 8-12 weeks, take a deload week (reduce volume by 50%) to avoid overtraining\n";
+
+  plan += `## Progression Tips
+${tips}`;
+
+  return plan;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Workout Request:", JSON.stringify(body, null, 2));
-    const daysRequested = parseInt(body.workoutDays);
-    console.log("Days Requested:", daysRequested);
-
-    // Generate fallback workout plan (works without API key, reliable for production fallback)
-    const generateFallbackPlan = (days: number) => {
-      let plan = `# Weekly Workout Plan (GymGen AI)
-
-## Day 1 - Upper Body Push
-Target Muscles: Chest, Shoulders, Triceps
-
-Exercises:
-1. Bench Press
-Sets: 4
-Reps: 8-10
-Rest: 90s
-
-2. Overhead Press
-Sets: 3
-Reps: 10-12
-Rest: 60s
-
-3. Incline Dumbbell Press
-Sets: 3
-Reps: 10-12
-Rest: 60s
-
-4. Tricep Dips
-Sets: 3
-Reps: 12-15
-Rest: 45s
-
-## Day 2 - Lower Body
-Target Muscles: Quads, Glutes, Hamstrings, Calves
-
-Exercises:
-1. Back Squats
-Sets: 4
-Reps: 8-10
-Rest: 90s
-
-2. Romanian Deadlifts
-Sets: 3
-Reps: 10-12
-Rest: 60s
-
-3. Walking Lunges
-Sets: 3
-Reps: 10 per leg
-Rest: 60s
-
-4. Leg Curls
-Sets: 3
-Reps: 12-15
-Rest: 45s
-
-5. Calf Raises
-Sets: 4
-Reps: 15-20
-Rest: 30s
-
-${days > 3 ? `## Day 3 - Upper Body Pull
-Target Muscles: Back, Biceps, Rear Delts
-
-Exercises:
-1. Pull-ups / Lat Pulldown
-Sets: 4
-Reps: 8-10
-Rest: 90s
-
-2. Bent Over Barbell Rows
-Sets: 3
-Reps: 10-12
-Rest: 60s
-
-3. Face Pulls
-Sets: 3
-Reps: 15-20
-Rest: 45s
-
-4. Dumbbell Bicep Curls
-Sets: 3
-Reps: 12-15
-Rest: 45s
-
-5. Hammer Curls
-Sets: 3
-Reps: 12-15
-Rest: 45s
-` : `## Day 3 - Active Recovery`}
-
-${days > 4 ? `## Day 4 - Full Body Strength
-Target Muscles: Full Body
-
-Exercises:
-1. Deadlifts
-Sets: 4
-Reps: 6-8
-Rest: 2-3min
-
-2. Push-ups (weighted if possible)
-Sets: 3
-Reps: 12-15
-Rest: 60s
-
-3. Kettlebell Swings
-Sets: 3
-Reps: 15-20
-Rest: 60s
-
-4. Plank
-Sets: 3
-Reps: 60s hold
-Rest: 30s
-` : ""}
-
-${days > 5 ? `## Day 5 - Upper Body Hypertrophy
-Target Muscles: Chest, Back, Shoulders, Arms
-
-Exercises:
-1. Incline Bench Press
-Sets: 4
-Reps: 10-12
-Rest: 75s
-
-2. Pull-ups (wide grip)
-Sets: 4
-Reps: 8-12
-Rest: 75s
-
-3. Lateral Raises
-Sets: 3
-Reps: 15-20
-Rest: 45s
-
-4. Tricep Pushdowns
-Sets: 3
-Reps: 12-15
-Rest: 45s
-
-5. Preacher Curls
-Sets: 3
-Reps: 12-15
-Rest: 45s
-` : ""}
-
-${days > 5 ? `## Day 6 - Lower Body Hypertrophy
-Target Muscles: Glutes, Quads, Hamstrings, Calves
-
-Exercises:
-1. Front Squats
-Sets: 4
-Reps: 10-12
-Rest: 90s
-
-2. Romanian Deadlifts (heavy)
-Sets: 4
-Reps: 8-10
-Rest: 90s
-
-3. Hip Thrusts
-Sets: 4
-Reps: 12-15
-Rest: 60s
-
-4. Standing Calf Raises
-Sets: 4
-Reps: 20-25
-Rest: 30s
-` : ""}
-
-## Warm Up
-- 5-10 minutes of light cardio (jogging, jumping jacks, rowing)
-- Dynamic stretching (arm circles, leg swings, torso twists)
-- Light 2 sets of the first exercise to warm up the joints and muscles
-- Foam rolling if available
-
-## Cool Down
-- Static stretching (30-60 seconds per stretch) for all worked muscles
-- Deep breathing for 2 minutes to lower heart rate
-- 5-minute slow walk
-- Foam rolling (if available)
-
-## Progression Tips
-- Add 2.5kg to compound lifts (squat, deadlift, bench, rows) when you can complete the top of the rep range for all sets
-- Track every workout in a notebook or app to ensure consistent progress
-- Prioritize perfect form over heavy weight - quality reps > heavy weight
-- Ensure 7-9 hours of sleep per night for optimal recovery and muscle growth
-- Stay consistent with your nutrition - hit your protein and calorie targets
-- Every 8-12 weeks, take a deload week (reduce volume by 50%) to avoid overtraining
-`;
-      return plan;
-    };
-
-    // Fallback for testing without API key
-    if (!process.env.GROQ_API_KEY) {
-      console.log("Using fallback workout plan (no GROQ_API_KEY)");
-      return NextResponse.json({
-        success: true,
-        workout: generateFallbackPlan(daysRequested),
-      });
-    }
-
-    const prompt = `CRITICAL: YOU MUST GENERATE A FULL RESPONSE WITHOUT ANY TRUNCATION. YOU MUST NOT STOP EARLY. YOU MUST COMPLETE EVERYTHING.
-
-You are an elite certified fitness coach and exercise physiologist. Your task is to generate a comprehensive weekly workout plan for this user.
-
-ABSOLUTELY CRITICAL REQUIREMENTS (YOU WILL BE PENALIZED IF YOU FAIL THESE):
-1. YOU MUST GENERATE EXACTLY ${daysRequested} WORKOUT DAYS: Day 1, Day 2, ..., Day ${daysRequested}
-2. YOU MUST NOT SKIP ANY DAYS
-3. YOU MUST NOT SUMMARIZE OR CUT SHORT ANY DAYS
-4. YOU MUST INCLUDE FULL EXERCISES, SETS, REPS, AND REST FOR EVERY SINGLE DAY
-5. YOU MUST INCLUDE A DETAILED WARM UP SECTION AT THE END
-6. YOU MUST INCLUDE A DETAILED COOL DOWN SECTION AT THE END
-7. YOU MUST INCLUDE 6-8 DETAILED PROGRESSION TIPS AT THE END
-8. YOUR ENTIRE RESPONSE MUST BE IN MARKDOWN FORMAT AS SPECIFIED BELOW
-9. DO NOT STOP TYPING UNTIL YOU HAVE COMPLETED EVERY SINGLE SECTION
-
-USER DETAILS:
-Gender: ${body.gender}
-Age: ${body.age}
-Height: ${body.height} cm
-Weight: ${body.weight} kg
-Goal: ${body.goal}
-Experience Level: ${body.experience}
-Workout Days Per Week: ${body.workoutDays}
-Available Equipment: ${body.equipment}
-Workout Duration: ${body.duration} minutes
-
-DETAILED INSTRUCTIONS:
-- Create a professional weekly workout split tailored perfectly to their goals, experience, and available equipment
-- For each day, specify a clear day name and target muscle groups
-- For every exercise, specify exact sets, reps, and rest periods
-- Include a detailed warm-up section (5-10 minutes of cardio, dynamic stretches, etc.)
-- Include a detailed cool-down section (static stretches, recovery tips, etc.)
-- Include 6-8 detailed progression tips that are specific to their goals and experience
-- Do NOT use any placeholders like [Day Name] - fill in everything
-- Keep workouts realistic, safe, and effective
-
-STRICT OUTPUT FORMAT (DO NOT DEVIATE):
-# Weekly Workout Plan
-
-## Day 1 - [Descriptive Day Name]
-Target Muscles: [Comma-separated muscle groups]
-
-Exercises:
-1. [First Exercise Name]
-Sets: X
-Reps: Y-Z
-Rest: 90s
-
-2. [Second Exercise Name]
-Sets: X
-Reps: Y-Z
-Rest: 60s
-
-(Continue with all exercises for Day 1)
-
-## Day 2 - [Descriptive Day Name]
-Target Muscles: [Comma-separated muscle groups]
-
-Exercises:
-1. [First Exercise Name]
-Sets: X
-Reps: Y-Z
-Rest: 90s
-
-(REPEAT THIS FULL STRUCTURE FOR DAY 1 THROUGH DAY ${daysRequested} - DO NOT SKIP ANY DAYS)
-
-## Warm Up
-- [Warm up instruction 1]
-- [Warm up instruction 2]
-- [Warm up instruction 3]
-- [Warm up instruction 4]
-- [Warm up instruction 5]
-
-## Cool Down
-- [Cool down instruction 1]
-- [Cool down instruction 2]
-- [Cool down instruction 3]
-- [Cool down instruction 4]
-
-## Progression Tips
-- [Progression tip 1 - specific to user's goals]
-- [Progression tip 2 - specific to user's experience]
-- [Progression tip 3 - about recovery]
-- [Progression tip 4 - about form]
-- [Progression tip 5 - about tracking]
-- [Progression tip 6 - about nutrition]
-
-AGAIN: YOU MUST COMPLETE EVERYTHING FROM DAY 1 TO DAY ${daysRequested} AND INCLUDE ALL SECTIONS. DO NOT TRUNCATE YOUR RESPONSE.`;
-
-    console.log("Sending request to Groq with prompt length:", prompt.length);
-
-    // Try to use Groq API, fall back to built-in plan if anything fails
-    try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          temperature: 0.65,
-          max_tokens: 12000,
-          top_p: 0.9,
-          messages: [
-            {
-              role: "system",
-              content: "You are an elite professional fitness trainer. You always generate complete, detailed workout plans without any truncation.",
-            },
-            { role: "user", content: prompt },
-          ],
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const workout = data?.choices?.[0]?.message?.content;
-
-        if (workout && workout.length > 1000) {
-          console.log("Successfully generated workout via Groq, Length:", workout.length);
-          console.log("Groq Raw Response:", JSON.stringify(data, null, 2));
-
-          // Verify the response has all required sections
-          const hasAllDays = Array.from({ length: daysRequested }, (_, i) => {
-            const dayNumber = i + 1;
-            return workout.toLowerCase().includes(`day ${dayNumber}`) ||
-                   workout.toLowerCase().includes(`## day ${dayNumber}`) ||
-                   workout.toLowerCase().includes(`### day ${dayNumber}`);
-          }).every(Boolean);
-          const hasWarmUp = workout.toLowerCase().includes("warm up");
-          const hasCoolDown = workout.toLowerCase().includes("cool down");
-          const hasTips = workout.toLowerCase().includes("progression tips") || workout.toLowerCase().includes("tips");
-
-          if (hasAllDays && hasWarmUp && hasCoolDown && hasTips) {
-            return NextResponse.json({ success: true, workout });
-          } else {
-            console.log("Groq response missing sections, using fallback plan");
-            return NextResponse.json({
-              success: true,
-              workout: generateFallbackPlan(daysRequested),
-            });
-          }
-        }
-      } else {
-        console.log("Groq API failed, using fallback plan");
-      }
-    } catch (apiError) {
-      console.error("Groq API request failed, using fallback plan:", apiError);
-    }
-
-    // Fallback to built-in plan
-    console.log("Using fallback workout plan (API failed or bad response)");
-    return NextResponse.json({
-      success: true,
-      workout: generateFallbackPlan(daysRequested),
-    });
+    
+    const plan = generatePersonalizedPlan(body);
+    return NextResponse.json({ success: true, workout: plan });
   } catch (error) {
     console.error("Workout API Error:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to generate workout plan" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: "Failed to generate workout plan" }, { status: 500 });
   }
 }
