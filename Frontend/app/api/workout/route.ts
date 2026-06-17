@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Workout Request:", body);
+    console.log("Workout Request:", JSON.stringify(body, null, 2));
+    const daysRequested = parseInt(body.workoutDays);
+    console.log("Days Requested:", daysRequested);
 
     // Fallback for testing without API key
     if (!process.env.GROQ_API_KEY) {
@@ -49,10 +51,28 @@ Sets: 3
 Reps: 15-20
 Rest: 30s
 
-## Day 3 - Rest / Active Recovery
+${daysRequested > 3 ? `## Day 3 - Upper Body 2
+Target Muscles: Back, Biceps
 
-## Day 4 - Full Body
-Target Muscles: Full Body
+Exercises:
+1. Pull-ups / Lat Pulldown
+Sets: 4
+Reps: 8-10
+Rest: 90s
+
+2. Bent Over Rows
+Sets: 3
+Reps: 10-12
+Rest: 60s
+
+3. Bicep Curls
+Sets: 3
+Reps: 12-15
+Rest: 45s
+` : `## Day 3 - Rest / Active Recovery`}
+
+${daysRequested > 4 ? `## Day 4 - Lower Body 2
+Target Muscles: Glutes, Hamstrings, Quads
 
 Exercises:
 1. Deadlifts
@@ -60,15 +80,51 @@ Sets: 4
 Reps: 6-8
 Rest: 2-3min
 
-2. Pull-ups / Lat Pulldown
+2. Lunges
 Sets: 3
-Reps: 8-10
+Reps: 10 per leg
 Rest: 60s
 
-3. Push-ups
+3. Leg Curls
 Sets: 3
 Reps: 12-15
 Rest: 45s
+` : ""}
+
+${daysRequested > 5 ? `## Day 5 - Full Body
+Target Muscles: Full Body
+
+Exercises:
+1. Kettlebell Swings
+Sets: 4
+Reps: 15-20
+Rest: 60s
+
+2. Push-ups
+Sets: 3
+Reps: 12-15
+Rest: 45s
+
+3. Plank
+Sets: 3
+Reps: 60s hold
+Rest: 30s
+` : ""}
+
+${daysRequested > 6 ? `## Day 6 - Active Recovery
+Target Muscles: Full Body (Light)
+
+Exercises:
+1. Walking / Jogging
+Sets: 1
+Reps: 30min
+Rest: None
+
+2. Yoga / Stretching
+Sets: 1
+Reps: 20min
+Rest: None
+` : ""}
 
 ## Warm Up
 - 5-10 min light cardio
@@ -91,8 +147,15 @@ Rest: 45s
       });
     }
 
-    const prompt = `
-You are an elite certified fitness coach. Generate a complete professional weekly workout plan.
+    const prompt = `You are an elite certified fitness coach. Generate a complete professional weekly workout plan with ABSOLUTELY NO TRUNCATION.
+
+CRITICAL REQUIREMENTS:
+1. Generate EXACTLY ${daysRequested} workout days: Day 1 through Day ${daysRequested}
+2. Do NOT skip any days
+3. Do NOT summarize or cut short any day
+4. Include FULL exercises, sets, reps, and rest for EVERY day
+5. ALWAYS include Warm Up, Cool Down, and Progression Tips at the end
+6. Use the EXACT markdown format specified below
 
 USER DETAILS:
 Gender: ${body.gender}
@@ -106,36 +169,58 @@ Available Equipment: ${body.equipment}
 Workout Duration: ${body.duration} minutes
 
 INSTRUCTIONS:
-- Create a weekly workout split.
-- Mention workout day names.
-- Mention target muscles.
-- Mention exercises.
-- Mention sets and reps.
-- Mention rest time.
-- Include warm-up.
-- Include cool-down.
-- Include progression tips.
-- Use markdown formatting.
-- Keep workouts realistic and practical.
+- Create a weekly workout split tailored to their goals
+- For each day, mention the day name and target muscles
+- For each exercise, list sets, reps, and rest time
+- Include warm-up, cool-down, and progression tips
+- Use markdown formatting
+- Keep workouts realistic and practical for their equipment
+- Do NOT stop early or omit any sections
 
-OUTPUT FORMAT:
+OUTPUT FORMAT (STRICTLY FOLLOW THIS):
 # Weekly Workout Plan
 
-## Day 1
-Target Muscles:
+## Day 1 - [Day Name]
+Target Muscles: [Muscles]
 
 Exercises:
-1. Exercise Name
+1. [Exercise 1 Name]
 Sets: X
 Reps: Y-Z
 Rest: 90s
 
-Continue for all workout days.
+2. [Exercise 2 Name]
+Sets: X
+Reps: Y-Z
+Rest: 60s
+
+(Continue with all exercises for Day 1)
+
+## Day 2 - [Day Name]
+Target Muscles: [Muscles]
+
+Exercises:
+1. [Exercise 1 Name]
+Sets: X
+Reps: Y-Z
+Rest: 90s
+
+(Repeat this structure for ALL ${daysRequested} days)
 
 ## Warm Up
+- [Warm up instructions]
+
 ## Cool Down
+- [Cool down instructions]
+
 ## Progression Tips
-`;
+- [Progression tip 1]
+- [Progression tip 2]
+- [Progression tip 3]
+
+IMPORTANT: Ensure Day 1 through Day ${daysRequested} are ALL present in your response.`;
+
+    console.log("Sending request to Groq with prompt length:", prompt.length);
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -146,11 +231,11 @@ Continue for all workout days.
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         temperature: 0.7,
-        max_tokens: 3000,
+        max_tokens: 8000,
         messages: [
           {
             role: "system",
-            content: "You are a professional fitness trainer and workout planner.",
+            content: "You are a professional fitness trainer and workout planner who always completes the full response without any truncation.",
           },
           { role: "user", content: prompt },
         ],
@@ -158,13 +243,16 @@ Continue for all workout days.
     });
 
     const data = await response.json();
-    console.log("Groq Response:", JSON.stringify(data, null, 2));
+    console.log("Raw Groq Response:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
+      console.error("Groq API Error:", response.status, response.statusText);
       return NextResponse.json({ success: false, error: data }, { status: response.status });
     }
 
     const workout = data?.choices?.[0]?.message?.content ?? "Workout plan could not be generated.";
+    console.log("Workout Generated Successfully, Length:", workout.length);
+
     return NextResponse.json({ success: true, workout });
   } catch (error) {
     console.error("Workout API Error:", error);
