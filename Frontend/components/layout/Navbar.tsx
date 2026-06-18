@@ -7,7 +7,9 @@ import { motion } from "framer-motion";
 
 const navLinks = [
   { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" }
+  { href: "#how-it-works", label: "How It Works" },
+  { href: "/workout-generator", label: "Workout Generator" },
+  { href: "/nutrition-generator", label: "Nutrition Generator" }
 ];
 
 export default function Navbar() {
