@@ -25,7 +25,7 @@ const features = [
   {
     icon: Apple,
     title: "Smart Nutrition",
-    href: "#",
+    href: "/nutrition-generator",
     description:
       "AI-powered nutrition plans with precise calorie tracking.",
     badge: "Nutrition",
