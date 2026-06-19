@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+
+export const dynamic = 'force-dynamic';
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -36,75 +38,76 @@ const suggestedQuestions = [
 ];
 
 const MarkdownComponents = {
-  h1: ({ children }: { children: React.ReactNode }) => (
-    <h1 className="text-lg md:text-2xl font-bold text-white mb-3 mt-5 first:mt-0">
+  h1: ({ children, ...props }: any) => (
+    <h1 {...props} className="text-lg md:text-2xl font-bold text-white mb-3 mt-5 first:mt-0">
       {children}
     </h1>
   ),
-  h2: ({ children }: { children: React.ReactNode }) => (
-    <h2 className="text-base md:text-xl font-bold text-white mb-2.5 mt-4">
+  h2: ({ children, ...props }: any) => (
+    <h2 {...props} className="text-base md:text-xl font-bold text-white mb-2.5 mt-4">
       {children}
     </h2>
   ),
-  h3: ({ children }: { children: React.ReactNode }) => (
-    <h3 className="text-sm md:text-lg font-semibold text-white mb-2 mt-3">
+  h3: ({ children, ...props }: any) => (
+    <h3 {...props} className="text-sm md:text-lg font-semibold text-white mb-2 mt-3">
       {children}
     </h3>
   ),
-  p: ({ children }: { children: React.ReactNode }) => (
-    <p className="text-xs md:text-sm text-gray-200 mb-2.5 leading-relaxed">
+  p: ({ children, ...props }: any) => (
+    <p {...props} className="text-xs md:text-sm text-gray-200 mb-2.5 leading-relaxed">
       {children}
     </p>
   ),
-  ul: ({ children }: { children: React.ReactNode }) => (
-    <ul className="list-disc list-outside ml-5 md:ml-6 space-y-1 mb-2.5 text-xs md:text-sm text-gray-200">
+  ul: ({ children, ...props }: any) => (
+    <ul {...props} className="list-disc list-outside ml-5 md:ml-6 space-y-1 mb-2.5 text-xs md:text-sm text-gray-200">
       {children}
     </ul>
   ),
-  ol: ({ children }: { children: React.ReactNode }) => (
-    <ol className="list-decimal list-outside ml-5 md:ml-6 space-y-1 mb-2.5 text-xs md:text-sm text-gray-200">
+  ol: ({ children, ...props }: any) => (
+    <ol {...props} className="list-decimal list-outside ml-5 md:ml-6 space-y-1 mb-2.5 text-xs md:text-sm text-gray-200">
       {children}
     </ol>
   ),
-  li: ({ children }: { children: React.ReactNode }) => (
-    <li className="leading-relaxed pl-1">{children}</li>
+  li: ({ children, ...props }: any) => (
+    <li {...props} className="leading-relaxed pl-1">{children}</li>
   ),
-  strong: ({ children }: { children: React.ReactNode }) => (
-    <strong className="font-semibold text-primary-400">{children}</strong>
+  strong: ({ children, ...props }: any) => (
+    <strong {...props} className="font-semibold text-primary-400">{children}</strong>
   ),
-  table: ({ children }: { children: React.ReactNode }) => (
-    <div className="overflow-x-auto w-full mb-3 -mx-3 md:mx-0">
+  table: ({ children, ...props }: any) => (
+    <div {...props} className="overflow-x-auto w-full mb-3 -mx-3 md:mx-0">
       <div className="inline-block min-w-full align-middle">
         <table className="min-w-full border-collapse">{children}</table>
       </div>
     </div>
   ),
-  thead: ({ children }: { children: React.ReactNode }) => (
-    <thead className="bg-primary-400/10">{children}</thead>
+  thead: ({ children, ...props }: any) => (
+    <thead {...props} className="bg-primary-400/10">{children}</thead>
   ),
-  tbody: ({ children }: { children: React.ReactNode }) => (
-    <tbody className="divide-y divide-white/10">{children}</tbody>
+  tbody: ({ children, ...props }: any) => (
+    <tbody {...props} className="divide-y divide-white/10">{children}</tbody>
   ),
-  tr: ({ children }: { children: React.ReactNode }) => <tr>{children}</tr>,
-  th: ({ children }: { children: React.ReactNode }) => (
-    <th className="px-3 py-2 text-left font-semibold text-primary-400 text-xs whitespace-nowrap">
+  tr: ({ children, ...props }: any) => <tr {...props}>{children}</tr>,
+  th: ({ children, ...props }: any) => (
+    <th {...props} className="px-3 py-2 text-left font-semibold text-primary-400 text-xs whitespace-nowrap">
       {children}
     </th>
   ),
-  td: ({ children }: { children: React.ReactNode }) => (
-    <td className="px-3 py-2 text-xs text-gray-200 whitespace-nowrap">
+  td: ({ children, ...props }: any) => (
+    <td {...props} className="px-3 py-2 text-xs text-gray-200 whitespace-nowrap">
       {children}
     </td>
   ),
-  blockquote: ({ children }: { children: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-primary-400/50 pl-3 py-1.5 my-2.5 bg-white/[0.02] rounded-r-lg text-xs md:text-sm text-gray-300 italic">
+  blockquote: ({ children, ...props }: any) => (
+    <blockquote {...props} className="border-l-2 border-primary-400/50 pl-3 py-1.5 my-2.5 bg-white/[0.02] rounded-r-lg text-xs md:text-sm text-gray-300 italic">
       {children}
     </blockquote>
   ),
-  code: ({ className, children }: { className?: string; children: React.ReactNode }) => {
+  code: ({ className, children, ...props }: any) => {
     const match = /language-(\w+)/.exec(className || "");
     return (
       <code
+        {...props}
         className={`${
           className || ""
         } ${!match ? "bg-primary-400/10 px-1 py-0.5 rounded text-[11px] md:text-xs text-primary-300" : ""}`}
@@ -113,8 +116,8 @@ const MarkdownComponents = {
       </code>
     );
   },
-  pre: ({ children }: { children: React.ReactNode }) => (
-    <pre className="bg-white/[0.02] p-3 rounded-lg my-2.5 overflow-x-auto text-[11px] md:text-xs w-full">
+  pre: ({ children, ...props }: any) => (
+    <pre {...props} className="bg-white/[0.02] p-3 rounded-lg my-2.5 overflow-x-auto text-[11px] md:text-xs w-full">
       {children}
     </pre>
   ),
