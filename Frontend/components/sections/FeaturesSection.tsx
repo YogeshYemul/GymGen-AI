@@ -34,7 +34,7 @@ const features = [
   {
     icon: Brain,
     title: "AI Fitness Coach",
-    href: "#",
+    href: "/fitness-coach",
     description:
       "Get instant workout and nutrition guidance anytime.",
     badge: "AI",
