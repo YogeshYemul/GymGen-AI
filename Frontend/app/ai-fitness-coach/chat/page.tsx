@@ -17,7 +17,7 @@ import {
   User,
 } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface Message {
   role: "user" | "assistant";
@@ -146,7 +146,7 @@ export default function AIFitnessCoachChatPage() {
     if (initialQuestion) {
       sendMessage(initialQuestion);
     }
-  }, []);
+  }, [initialQuestion]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isTyping) return;

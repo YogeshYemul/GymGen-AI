@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
-
-export const dynamic = 'force-dynamic';
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -18,6 +16,8 @@ import {
   Dumbbell,
   User,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 interface Message {
   role: "user" | "assistant";
@@ -146,7 +146,7 @@ export default function AIFitnessCoachChatPage() {
     if (initialQuestion) {
       sendMessage(initialQuestion);
     }
-  }, []);
+  }, [initialQuestion]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isTyping) return;
