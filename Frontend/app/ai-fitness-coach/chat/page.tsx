@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -16,8 +16,6 @@ import {
   Dumbbell,
   User,
 } from "lucide-react";
-
-export const dynamic = "force-dynamic";
 
 interface Message {
   role: "user" | "assistant";
@@ -123,7 +121,7 @@ const MarkdownComponents = {
   ),
 };
 
-export default function AIFitnessCoachChatPage() {
+function ChatContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuestion = searchParams.get("q");
@@ -481,5 +479,13 @@ export default function AIFitnessCoachChatPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AIFitnessCoachChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black"></div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
