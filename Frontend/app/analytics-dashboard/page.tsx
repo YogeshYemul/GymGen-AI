@@ -16,12 +16,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
 } from "recharts";
 import { createClient } from "@/lib/supabase";
 import {
@@ -40,7 +34,10 @@ import {
   Award,
   Calendar,
   Info,
-  ChevronRight
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+  Minus,
 } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 
@@ -71,7 +68,7 @@ const Card = ({ children, className = "", delay = 0 }: { children: React.ReactNo
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay }}
-    className={`bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 hover:border-primary-400/30 transition-all ${className}`}
+    className={`bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 hover:border-primary-400/30 transition-all ${className}`}
   >
     {children}
   </motion.div>
@@ -97,35 +94,35 @@ const StatCard = ({
   <Card delay={delay}>
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-[11px] sm:text-xs text-white/50 mb-1">{title}</p>
-        <p className={`text-xl sm:text-2xl font-bold ${color}`}>{value}</p>
-        {subValue && <p className="text-[10px] sm:text-xs text-white/40 mt-1">{subValue}</p>}
+        <p className="text-[10px] sm:text-[11px] text-white/50 mb-1">{title}</p>
+        <p className={`text-lg sm:text-xl font-bold ${color}`}>{value}</p>
+        {subValue && <p className="text-[9px] sm:text-[10px] text-white/40 mt-1">{subValue}</p>}
       </div>
-      <div className={`${bgColor} p-2.5 rounded-lg`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+      <div className={`${bgColor} p-2 rounded-lg`}>
+        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${color}`} />
       </div>
     </div>
   </Card>
 );
 
 const LineChartComponent = ({ data, dataKey, title, color = "#F5C518" }: any) => (
-  <Card className="w-full">
-    <h3 className="text-xs sm:text-sm font-semibold text-white mb-4">{title}</h3>
-    <div className="h-48 sm:h-56">
+  <Card className="w-full overflow-hidden">
+    <h3 className="text-[11px] sm:text-xs font-semibold text-white mb-3">{title}</h3>
+    <div className="h-40 sm:h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: -5, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
           <XAxis
             dataKey="date"
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
             tickFormatter={(date: string) =>
               new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
             }
           />
           <YAxis
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
             tickFormatter={(value: number) => `${value}`}
           />
           <Tooltip
@@ -133,7 +130,7 @@ const LineChartComponent = ({ data, dataKey, title, color = "#F5C518" }: any) =>
               backgroundColor: "#000000",
               border: "1px solid #F5C51830",
               borderRadius: "8px",
-              fontSize: "10px"
+              fontSize: "9px"
             }}
             labelStyle={{ color: "#F5C518" }}
           />
@@ -142,8 +139,8 @@ const LineChartComponent = ({ data, dataKey, title, color = "#F5C518" }: any) =>
             dataKey={dataKey}
             stroke={color}
             strokeWidth={2}
-            dot={{ fill: color, r: 2 }}
-            activeDot={{ r: 3.5 }}
+            dot={{ fill: color, r: 1.5 }}
+            activeDot={{ r: 3 }}
             animationDuration={1500}
           />
         </LineChart>
@@ -153,27 +150,27 @@ const LineChartComponent = ({ data, dataKey, title, color = "#F5C518" }: any) =>
 );
 
 const BarChartComponent = ({ data, title }: any) => (
-  <Card className="w-full">
-    <h3 className="text-xs sm:text-sm font-semibold text-white mb-4">{title}</h3>
-    <div className="h-48 sm:h-56">
+  <Card className="w-full overflow-hidden">
+    <h3 className="text-[11px] sm:text-xs font-semibold text-white mb-3">{title}</h3>
+    <div className="h-40 sm:h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+        <BarChart data={data} margin={{ top: 5, right: 5, left: -5, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
           <XAxis
             dataKey="name"
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
           />
           <YAxis
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
           />
           <Tooltip
             contentStyle={{
               backgroundColor: "#000000",
               border: "1px solid #F5C51830",
               borderRadius: "8px",
-              fontSize: "10px"
+              fontSize: "9px"
             }}
             labelStyle={{ color: "#F5C518" }}
           />
@@ -185,13 +182,13 @@ const BarChartComponent = ({ data, title }: any) => (
 );
 
 const AreaChartComponent = ({ data, dataKey, title }: any) => (
-  <Card className="w-full">
-    <h3 className="text-xs sm:text-sm font-semibold text-white mb-4">{title}</h3>
-    <div className="h-48 sm:h-56">
+  <Card className="w-full overflow-hidden">
+    <h3 className="text-[11px] sm:text-xs font-semibold text-white mb-3">{title}</h3>
+    <div className="h-40 sm:h-48">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -5, bottom: 5 }}>
           <defs>
-            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="colorValue" x1="0%" y1="0%" x2="0%" y2="1">
               <stop offset="5%" stopColor="#F5C518" stopOpacity={0.3} />
               <stop offset="95%" stopColor="#F5C518" stopOpacity={0} />
             </linearGradient>
@@ -200,21 +197,21 @@ const AreaChartComponent = ({ data, dataKey, title }: any) => (
           <XAxis
             dataKey="date"
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
             tickFormatter={(date: string) =>
               new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
             }
           />
           <YAxis
             stroke="#ffffff40"
-            tick={{ fontSize: 8, fill: "#ffffff60" }}
+            tick={{ fontSize: 7, fill: "#ffffff60" }}
           />
           <Tooltip
             contentStyle={{
               backgroundColor: "#000000",
               border: "1px solid #F5C51830",
               borderRadius: "8px",
-              fontSize: "10px"
+              fontSize: "9px"
             }}
             labelStyle={{ color: "#F5C518" }}
           />
@@ -242,12 +239,12 @@ const BMIGauge = ({ bmi, category }: { bmi: number; category: string }) => {
 
   return (
     <Card>
-      <h3 className="text-xs sm:text-sm font-semibold text-white mb-4 flex items-center gap-2">
-        <Scale className="w-4 h-4 text-primary-400" />
+      <h3 className="text-[11px] sm:text-xs font-semibold text-white mb-3 flex items-center gap-2">
+        <Scale className="w-3.5 h-3.5 text-primary-400" />
         BMI Analysis
       </h3>
       <div className="flex flex-col items-center">
-        <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-4">
+        <div className="relative w-28 h-28 sm:w-36 sm:h-36 mb-3">
           <svg viewBox="0 0 200 200" className="w-full h-full">
             <defs>
               <linearGradient id="bmiGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -272,14 +269,14 @@ const BMIGauge = ({ bmi, category }: { bmi: number; category: string }) => {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl sm:text-4xl font-bold" style={{ color: getBMIColor() }}>
+            <span className="text-2xl sm:text-3xl font-bold" style={{ color: getBMIColor() }}>
               {bmi.toFixed(1)}
             </span>
-            <span className="text-[10px] sm:text-xs text-white/50 mt-1">BMI</span>
+            <span className="text-[9px] sm:text-[10px] text-white/50 mt-1">BMI</span>
           </div>
         </div>
-        <p className="text-xs sm:text-sm font-semibold text-white mb-2">{category}</p>
-        <p className="text-[10px] sm:text-xs text-white/40 text-center">
+        <p className="text-[11px] sm:text-xs font-semibold text-white mb-1.5">{category}</p>
+        <p className="text-[9px] sm:text-[10px] text-white/40 text-center">
           {category === "Underweight" && "Consider increasing your calorie intake with nutrient-dense foods."}
           {category === "Normal" && "Excellent! Maintain your current healthy lifestyle and fitness routine."}
           {category === "Overweight" && "Focus on regular exercise and balanced nutrition to improve your health."}
@@ -359,46 +356,70 @@ export default function AnalyticsDashboardPage() {
   const armsDiff = calculateDifference(currentArms, previousArms);
   const thighsDiff = calculateDifference(currentThighs, previousThighs);
 
+  const getChangeIndicator = (value: number, isGoodIncrease: boolean = false) => {
+    if (value > 0) {
+      return {
+        icon: ArrowUp,
+        color: isGoodIncrease ? "text-green-400" : "text-red-400",
+        bgColor: isGoodIncrease ? "bg-green-400/10" : "bg-red-400/10",
+        sign: "+"
+      };
+    } else if (value < 0) {
+      return {
+        icon: ArrowDown,
+        color: isGoodIncrease ? "text-red-400" : "text-green-400",
+        bgColor: isGoodIncrease ? "bg-red-400/10" : "bg-green-400/10",
+        sign: ""
+      };
+    }
+    return {
+      icon: Minus,
+      color: "text-gray-400",
+      bgColor: "bg-gray-400/10",
+      sign: ""
+    };
+  };
+
   const comparisonData = [
     {
       label: "Weight",
       current: `${currentWeight.toFixed(1)} kg`,
       previous: `${previousWeight.toFixed(1)} kg`,
-      diff: weightChange > 0 ? `+${weightChange.toFixed(1)} kg` : `${weightChange.toFixed(1)} kg`,
-      percent: previousWeight !== 0 ? `${Math.round((weightChange / previousWeight) * 100)}%` : "0%",
-      isImproved: weightChange < 0
+      diff: weightChange,
+      percent: previousWeight !== 0 ? Math.round((weightChange / previousWeight) * 100) : 0,
+      isGoodIncrease: false
     },
     {
       label: "Chest",
       current: currentChest ? `${currentChest.toFixed(1)} cm` : "-",
       previous: previousChest ? `${previousChest.toFixed(1)} cm` : "-",
-      diff: chestDiff.diff > 0 ? `+${chestDiff.diff.toFixed(1)} cm` : `${chestDiff.diff.toFixed(1)} cm`,
-      percent: `${chestDiff.percent}%`,
-      isImproved: chestDiff.diff > 0
+      diff: chestDiff.diff,
+      percent: chestDiff.percent,
+      isGoodIncrease: true
     },
     {
       label: "Waist",
       current: currentWaist ? `${currentWaist.toFixed(1)} cm` : "-",
       previous: previousWaist ? `${previousWaist.toFixed(1)} cm` : "-",
-      diff: waistDiff.diff > 0 ? `+${waistDiff.diff.toFixed(1)} cm` : `${waistDiff.diff.toFixed(1)} cm`,
-      percent: `${waistDiff.percent}%`,
-      isImproved: waistDiff.diff < 0
+      diff: waistDiff.diff,
+      percent: waistDiff.percent,
+      isGoodIncrease: false
     },
     {
       label: "Arms",
       current: currentArms ? `${currentArms.toFixed(1)} cm` : "-",
       previous: previousArms ? `${previousArms.toFixed(1)} cm` : "-",
-      diff: armsDiff.diff > 0 ? `+${armsDiff.diff.toFixed(1)} cm` : `${armsDiff.diff.toFixed(1)} cm`,
-      percent: `${armsDiff.percent}%`,
-      isImproved: armsDiff.diff > 0
+      diff: armsDiff.diff,
+      percent: armsDiff.percent,
+      isGoodIncrease: true
     },
     {
       label: "Thighs",
       current: currentThighs ? `${currentThighs.toFixed(1)} cm` : "-",
       previous: previousThighs ? `${previousThighs.toFixed(1)} cm` : "-",
-      diff: thighsDiff.diff > 0 ? `+${thighsDiff.diff.toFixed(1)} cm` : `${thighsDiff.diff.toFixed(1)} cm`,
-      percent: `${thighsDiff.percent}%`,
-      isImproved: thighsDiff.diff > 0
+      diff: thighsDiff.diff,
+      percent: thighsDiff.percent,
+      isGoodIncrease: true
     }
   ];
 
@@ -483,69 +504,72 @@ export default function AnalyticsDashboardPage() {
     `Your progress is ${progressPercent > 0 ? "excellent" : "steady"} compared to last week`
   ].filter(Boolean);
 
+  const weightChangeIndicator = getChangeIndicator(weightChange, false);
+  const WeightIcon = weightChangeIndicator.icon;
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 py-4"
+        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 py-3 sm:py-4"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <button
             onClick={() => router.push("/")}
-            className="p-2 bg-white/5 border border-white/10 rounded-xl hover:border-primary-400/30 hover:bg-primary-400/5 transition-all group"
+            className="p-1.5 sm:p-2 bg-white/5 border border-white/10 rounded-xl hover:border-primary-400/30 hover:bg-primary-400/5 transition-all group"
           >
-            <ArrowLeft size={16} className="text-white/70 group-hover:text-primary-400 transition-colors" />
+            <ArrowLeft size={14} className="text-white/70 group-hover:text-primary-400 transition-colors" />
           </button>
 
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-8 h-8 flex items-center justify-center">
+            <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
               <div className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm group-hover:rotate-[60deg] transition-transform duration-300" />
-              <Zap size={16} className="relative z-10 text-black fill-black" />
+              <Zap size={14} className="relative z-10 text-black fill-black" />
             </div>
-            <span className="font-serif font-black text-lg tracking-tight">
+            <span className="font-serif font-black text-base sm:text-lg tracking-tight">
               Gym<span className="text-primary-400">Gen</span>
-              <span className="text-white/40 text-xs font-light ml-1">AI</span>
+              <span className="text-white/40 text-[10px] sm:text-xs font-light ml-1">AI</span>
             </span>
           </Link>
 
-          <div className="w-10" />
+          <div className="w-9 sm:w-10" />
         </div>
       </motion.nav>
 
-      <main className="pt-24 pb-16">
+      <main className="pt-20 sm:pt-24 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center mb-10"
+            className="text-center mb-8 sm:mb-10"
           >
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold mb-2">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-serif font-bold mb-1.5 sm:mb-2">
               Analytics Dashboard
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-white/60 max-w-2xl mx-auto">
+            <p className="text-[10px] sm:text-xs md:text-sm text-white/60 max-w-2xl mx-auto">
               Track your fitness performance, body transformation and progress insights with GymGen AI.
             </p>
           </motion.div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-8 sm:mb-10">
               {[...Array(6)].map((_, i) => (
                 <Card key={i} delay={i * 0.1}>
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
-                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
-                      <div className="h-6 bg-white/10 rounded w-20 animate-pulse" />
+                      <div className="h-2 bg-white/10 rounded w-12 sm:w-16 animate-pulse" />
+                      <div className="h-4 sm:h-5 bg-white/10 rounded w-16 sm:w-20 animate-pulse" />
                     </div>
-                    <div className="w-8 h-8 bg-white/10 rounded-lg animate-pulse" />
+                    <div className="w-6 sm:w-8 h-6 sm:h-8 bg-white/10 rounded-lg animate-pulse" />
                   </div>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-8 sm:mb-10">
               <StatCard
                 title="Current Weight"
                 value={`${currentWeight.toFixed(1)} kg`}
@@ -560,10 +584,10 @@ export default function AnalyticsDashboardPage() {
               />
               <StatCard
                 title="Weight Change"
-                value={`${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)} kg`}
-                icon={weightChange < 0 ? TrendingDown : TrendingUp}
-                color={weightChange < 0 ? "text-green-400" : "text-red-400"}
-                bgColor={weightChange < 0 ? "bg-green-400/10" : "bg-red-400/10"}
+                value={`${weightChangeIndicator.sign}${weightChange.toFixed(1)} kg`}
+                icon={WeightIcon}
+                color={weightChangeIndicator.color}
+                bgColor={weightChangeIndicator.bgColor}
                 delay={0.2}
               />
               <StatCard
@@ -590,32 +614,39 @@ export default function AnalyticsDashboardPage() {
 
           {!loading && (
             <>
-              <div className="mb-10">
-                <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-primary-400" />
+              <div className="mb-8 sm:mb-10">
+                <h2 className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5 text-primary-400" />
                   Body Transformation Analysis
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
-                  {comparisonData.map((item, i) => (
-                    <Card key={item.label} delay={0.1 * i}>
-                      <p className="text-[11px] sm:text-xs text-white/50 mb-2">{item.label}</p>
-                      <p className="text-sm sm:text-base font-bold text-white mb-1">{item.current}</p>
-                      <p className="text-[10px] sm:text-xs text-white/40 mb-2">Prev: {item.previous}</p>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-[10px] sm:text-xs font-semibold ${item.isImproved ? "text-green-400" : "text-red-400"}`}>
-                          {item.diff}
-                        </span>
-                        <span className={`text-[10px] sm:text-xs ${item.isImproved ? "text-green-400" : "text-red-400"}`}>
-                          {item.isImproved ? "+" : ""}{item.percent}
-                        </span>
-                      </div>
-                    </Card>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-3">
+                  {comparisonData.map((item, i) => {
+                    const indicator = getChangeIndicator(item.diff, item.isGoodIncrease);
+                    const ChangeIcon = indicator.icon;
+                    return (
+                      <Card key={item.label} delay={0.1 * i}>
+                        <p className="text-[10px] sm:text-[11px] text-white/50 mb-1.5">{item.label}</p>
+                        <p className="text-sm sm:text-base font-bold text-white mb-1">{item.current}</p>
+                        <p className="text-[9px] sm:text-[10px] text-white/40 mb-1.5">Prev: {item.previous}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            <ChangeIcon className="w-3 h-3" style={{ color: indicator.color === "text-green-400" ? "#34D399" : "#EF4444" }} />
+                            <span className={`text-[9px] sm:text-[10px] font-semibold ${indicator.color}`}>
+                              {indicator.sign}{item.diff.toFixed(1)}
+                            </span>
+                          </div>
+                          <span className={`text-[9px] sm:text-[10px] font-semibold ${indicator.color}`}>
+                            {indicator.sign}{Math.abs(item.percent)}%
+                          </span>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
 
               {chartData.length > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-10">
                   <LineChartComponent data={chartData} dataKey="weight" title="Weight Progress" />
                   {chartData.some((d: any) => d.chest) && (
                     <LineChartComponent data={chartData.filter((d: any) => d.chest)} dataKey="chest" title="Chest Progress" color="#60A5FA" />
@@ -632,7 +663,7 @@ export default function AnalyticsDashboardPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-10">
                 {barChartData.length > 0 && <BarChartComponent data={barChartData} title="Body Measurements Comparison" />}
                 {monthlyData.length > 0 && <AreaChartComponent data={monthlyData} dataKey="weight" title="Monthly Progress Trend" />}
                 {weeklyData.length > 0 && <BarChartComponent data={weeklyData} title="Weekly Progress Summary" />}
@@ -640,20 +671,20 @@ export default function AnalyticsDashboardPage() {
 
               <BMIGauge bmi={bmi} category={getBMICategory(bmi)} />
 
-              <Card className="mt-10">
-                <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Target className="w-4 h-4 text-primary-400" />
+              <Card className="mt-8 sm:mt-10">
+                <h2 className="text-sm sm:text-base font-semibold mb-3 flex items-center gap-2">
+                  <Target className="w-3.5 h-3.5 text-primary-400" />
                   Goal Tracker
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs sm:text-sm text-white/60">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <span className="text-[10px] sm:text-xs text-white/60">
                         {startingWeight.toFixed(1)} kg → {goalWeight.toFixed(1)} kg
                       </span>
-                      <span className="text-xs sm:text-sm font-semibold text-primary-400">{Math.min(Math.max(Math.abs(progressPercent), 0), 100)}%</span>
+                      <span className="text-[10px] sm:text-xs font-semibold text-primary-400">{Math.min(Math.max(Math.abs(progressPercent), 0), 100)}%</span>
                     </div>
-                    <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(Math.max(Math.abs(progressPercent), 0), 100)}%` }}
@@ -662,55 +693,55 @@ export default function AnalyticsDashboardPage() {
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                     <div>
-                      <p className="text-xs text-white/50">Current</p>
-                      <p className="text-lg font-bold text-white">{currentWeight.toFixed(1)} kg</p>
+                      <p className="text-[10px] sm:text-xs text-white/50">Current</p>
+                      <p className="text-base sm:text-lg font-bold text-white">{currentWeight.toFixed(1)} kg</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/50">Target</p>
-                      <p className="text-lg font-bold text-primary-400">{goalWeight.toFixed(1)} kg</p>
+                      <p className="text-[10px] sm:text-xs text-white/50">Target</p>
+                      <p className="text-base sm:text-lg font-bold text-primary-400">{goalWeight.toFixed(1)} kg</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/50">Remaining</p>
-                      <p className="text-lg font-bold text-white">{Math.abs(goalWeight - currentWeight).toFixed(1)} kg</p>
+                      <p className="text-[10px] sm:text-xs text-white/50">Remaining</p>
+                      <p className="text-base sm:text-lg font-bold text-white">{Math.abs(goalWeight - currentWeight).toFixed(1)} kg</p>
                     </div>
                   </div>
                 </div>
               </Card>
 
-              <div className="mt-10">
-                <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-primary-400" />
+              <div className="mt-8 sm:mt-10">
+                <h2 className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                  <Trophy className="w-3.5 h-3.5 text-primary-400" />
                   Achievements
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2 sm:gap-3">
                   {achievements.map((achievement, i) => (
                     <Card key={achievement.id} delay={0.1 * i} className={`${achievement.unlocked ? "" : "opacity-40 grayscale"}`}>
                       <div className="flex flex-col items-center text-center">
                         <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-1.5 sm:mb-2"
                           style={{ backgroundColor: achievement.unlocked ? `${achievement.color}20` : "#ffffff10" }}
                         >
-                          <achievement.icon className="w-5 h-5" style={{ color: achievement.unlocked ? achievement.color : "#ffffff40" }} />
+                          <achievement.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: achievement.unlocked ? achievement.color : "#ffffff40" }} />
                         </div>
-                        <p className="text-[10px] sm:text-xs font-semibold text-white">{achievement.name}</p>
-                        <p className="text-[9px] sm:text-[10px] text-white/40 mt-1">{achievement.description}</p>
+                        <p className="text-[9px] sm:text-[10px] font-semibold text-white">{achievement.name}</p>
+                        <p className="text-[8px] sm:text-[9px] text-white/40 mt-0.5">{achievement.description}</p>
                       </div>
                     </Card>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-10">
-                <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-primary-400" />
+              <div className="mt-8 sm:mt-10">
+                <h2 className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                  <Info className="w-3.5 h-3.5 text-primary-400" />
                   AI Insights
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {aiInsights.map((insight, i) => (
                     <Card key={i} delay={0.1 * i}>
-                      <p className="text-xs sm:text-sm text-white/80">{insight}</p>
+                      <p className="text-[10px] sm:text-xs text-white/80">{insight}</p>
                     </Card>
                   ))}
                 </div>
@@ -720,14 +751,14 @@ export default function AnalyticsDashboardPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
-                className="mt-12 text-center"
+                className="mt-10 sm:mt-12 text-center"
               >
                 <Link
                   href="/progress-tracking"
-                  className="inline-flex items-center gap-2 bg-primary-400 text-black px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold hover:bg-primary-300 transition-all text-xs sm:text-sm"
+                  className="inline-flex items-center gap-2 bg-primary-400 text-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-primary-300 transition-all text-[10px] sm:text-xs"
                 >
                   Go To Progress Tracking
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </motion.div>
             </>
@@ -737,19 +768,19 @@ export default function AnalyticsDashboardPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-16"
+              className="text-center py-12 sm:py-16"
             >
-              <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3.5">
-                <Activity className="w-7 h-7 text-primary-400" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-2.5 sm:mb-3.5">
+                <Activity className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">No Data Yet</h3>
-              <p className="text-xs sm:text-sm text-white/60 mb-6">Log your first progress entry to see analytics</p>
+              <h3 className="text-sm sm:text-base lg:text-lg font-semibold mb-1.5 sm:mb-2">No Data Yet</h3>
+              <p className="text-[10px] sm:text-xs text-white/60 mb-4 sm:mb-6">Log your first progress entry to see analytics</p>
               <Link
                 href="/progress-tracking"
-                className="inline-flex items-center gap-2 bg-primary-400 text-black px-6 py-3 rounded-xl font-semibold hover:bg-primary-300 transition-all text-xs sm:text-sm"
+                className="inline-flex items-center gap-2 bg-primary-400 text-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-primary-300 transition-all text-[10px] sm:text-xs"
               >
                 Log Progress
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </motion.div>
           )}
