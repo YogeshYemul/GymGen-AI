@@ -43,7 +43,7 @@ const features = [
   {
     icon: TrendingUp,
     title: "Progress Tracking",
-    href: "#",
+    href: "/progress-tracking",
     description:
       "Monitor your fitness journey with visual insights.",
     badge: "Analytics",
