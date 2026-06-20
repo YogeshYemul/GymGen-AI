@@ -52,7 +52,7 @@ const features = [
   {
     icon: BarChart2,
     title: "Analytics Dashboard",
-    href: "#",
+    href: "/analytics-dashboard",
     description:
       "Track performance through detailed fitness analytics.",
     badge: "Insights",
