@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { createClient } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import { Calendar, Weight, TrendingUp, Target, Activity, CheckCircle, Plus, Save } from "lucide-react";
+import { Calendar, Weight, TrendingUp, Target, Activity, CheckCircle, Plus, Save, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -77,6 +78,7 @@ function ProgressChart({ data, dataKey, title, color = "#F5C518" }: any) {
 }
 
 export default function ProgressTrackingPage() {
+  const router = useRouter();
   const [entries, setEntries] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -173,10 +175,28 @@ export default function ProgressTrackingPage() {
       <Navbar />
       <main className="pt-24 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-8"
+          >
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:border-primary-400/30 hover:bg-primary-400/5 transition-all group"
+            >
+              <ArrowLeft size={18} className="text-white/70 group-hover:text-primary-400 transition-colors" />
+              <span className="text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                Back to Home
+              </span>
+            </button>
+          </motion.div>
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-center mb-12"
           >
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-3">
