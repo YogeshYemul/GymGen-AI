@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { createClient } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import { Calendar, Weight, TrendingUp, Target, Activity, CheckCircle, Plus, Save, ArrowLeft } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
+import { Calendar, Weight, TrendingUp, Target, Activity, CheckCircle, Plus, Save, ArrowLeft, Zap } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 
 interface ProgressEntry {
@@ -34,22 +34,22 @@ const motivationalMessages = [
 function ProgressChart({ data, dataKey, title, color = "#F5C518" }: any) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6">
-      <h3 className="text-sm font-semibold text-white mb-4">{title}</h3>
-      <div className="h-64 sm:h-72">
+      <h3 className="text-xs sm:text-sm font-semibold text-white mb-4">{title}</h3>
+      <div className="h-56 sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
             <XAxis
               dataKey="date"
               stroke="#ffffff40"
-              tick={{ fontSize: 10, fill: "#ffffff60" }}
+              tick={{ fontSize: 9, fill: "#ffffff60" }}
               tickFormatter={(date: string) =>
                 new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
               }
             />
             <YAxis
               stroke="#ffffff40"
-              tick={{ fontSize: 10, fill: "#ffffff60" }}
+              tick={{ fontSize: 9, fill: "#ffffff60" }}
               tickFormatter={(value: number) => `${value}`}
             />
             <Tooltip
@@ -57,7 +57,7 @@ function ProgressChart({ data, dataKey, title, color = "#F5C518" }: any) {
                 backgroundColor: "#000000",
                 border: "1px solid #F5C51830",
                 borderRadius: "8px",
-                fontSize: "12px"
+                fontSize: "11px"
               }}
               labelStyle={{ color: "#F5C518" }}
             />
@@ -66,8 +66,8 @@ function ProgressChart({ data, dataKey, title, color = "#F5C518" }: any) {
               dataKey={dataKey}
               stroke={color}
               strokeWidth={2}
-              dot={{ fill: color, r: 3 }}
-              activeDot={{ r: 5 }}
+              dot={{ fill: color, r: 2.5 }}
+              activeDot={{ r: 4 }}
               animationDuration={1500}
             />
           </LineChart>
@@ -172,42 +172,56 @@ export default function ProgressTrackingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Navbar />
-      <main className="pt-24 pb-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Custom Navbar */}
+      <motion.nav
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 py-4"
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Back Button */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mb-8"
+          <button
+            onClick={() => router.push("/")}
+            className="p-2 bg-white/5 border border-white/10 rounded-xl hover:border-primary-400/30 hover:bg-primary-400/5 transition-all group"
           >
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:border-primary-400/30 hover:bg-primary-400/5 transition-all group"
-            >
-              <ArrowLeft size={18} className="text-white/70 group-hover:text-primary-400 transition-colors" />
-              <span className="text-sm font-medium text-white/70 group-hover:text-white transition-colors">
-                Back to Home
-              </span>
-            </button>
-          </motion.div>
+            <ArrowLeft size={16} className="text-white/70 group-hover:text-primary-400 transition-colors" />
+          </button>
           
+          {/* GymGen AI Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="relative w-8 h-8 flex items-center justify-center">
+              <div className="absolute inset-0 bg-primary-400 rotate-45 rounded-sm group-hover:rotate-[60deg] transition-transform duration-300" />
+              <Zap size={16} className="relative z-10 text-black fill-black" />
+            </div>
+            <span className="font-serif font-black text-lg tracking-tight">
+              Gym<span className="text-primary-400">Gen</span>
+              <span className="text-white/40 text-xs font-light ml-1">AI</span>
+            </span>
+          </Link>
+          
+          {/* Spacer for perfect alignment */}
+          <div className="w-10" />
+        </div>
+      </motion.nav>
+
+      <main className="pt-20 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center mb-10"
           >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-3">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold mb-2">
               Your Progress Journey
             </h1>
-            <p className="text-sm sm:text-base text-white/60 max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm text-white/60 max-w-2xl mx-auto">
               Track your body transformation and stay consistent with GymGen AI.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
             {loading ? (
               Array(4).fill(null).map((_, index) => (
                 <motion.div
@@ -215,14 +229,14 @@ export default function ProgressTrackingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6"
+                  className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5"
                 >
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
-                      <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
-                      <div className="h-7 bg-white/10 rounded w-24 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
+                      <div className="h-5 bg-white/10 rounded w-20 animate-pulse" />
                     </div>
-                    <div className="w-10 h-10 bg-white/10 rounded-xl animate-pulse" />
+                    <div className="w-8 h-8 bg-white/10 rounded-lg animate-pulse" />
                   </div>
                 </motion.div>
               ))
@@ -238,15 +252,15 @@ export default function ProgressTrackingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 hover:border-primary-400/30 transition-all"
+                  className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 hover:border-primary-400/30 transition-all"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs text-white/50 mb-1">{card.title}</p>
-                      <p className={`text-xl sm:text-2xl font-bold ${card.color}`}>{card.value}</p>
+                      <p className="text-[11px] sm:text-xs text-white/50 mb-1">{card.title}</p>
+                      <p className={`text-lg sm:text-xl font-bold ${card.color}`}>{card.value}</p>
                     </div>
-                    <div className={`${card.bg} p-2.5 rounded-xl`}>
-                      <card.icon className={`w-5 h-5 ${card.color}`} />
+                    <div className={`${card.bg} p-2 rounded-lg`}>
+                      <card.icon className={`w-4 h-4 ${card.color}`} />
                     </div>
                   </div>
                 </motion.div>
@@ -258,15 +272,15 @@ export default function ProgressTrackingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-8 mb-12"
+            className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 mb-10"
           >
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 bg-primary-400/10 rounded-lg flex items-center justify-center">
-                <Plus className="w-4 h-4 text-primary-400" />
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-7 h-7 bg-primary-400/10 rounded-lg flex items-center justify-center">
+                <Plus className="w-3.5 h-3.5 text-primary-400" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold">Log New Progress</h2>
+              <h2 className="text-base sm:text-lg font-semibold">Log New Progress</h2>
             </div>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
                 { name: "weight", label: "Current Weight (kg)", type: "number", step: "0.1", required: true },
                 { name: "goalWeight", label: "Goal Weight (kg)", type: "number", step: "0.1", required: true },
@@ -277,7 +291,7 @@ export default function ProgressTrackingPage() {
                 { name: "date", label: "Date", type: "date", required: true }
               ].map((field) => (
                 <div key={field.name} className={field.name === "date" ? "sm:col-span-2 lg:col-span-3" : ""}>
-                  <label className="block text-xs text-white/60 mb-1.5">
+                  <label className="block text-[11px] text-white/60 mb-1.5">
                     {field.label}
                     {field.required && <span className="text-primary-400 ml-1">*</span>}
                   </label>
@@ -286,7 +300,7 @@ export default function ProgressTrackingPage() {
                     step={field.step}
                     value={form[field.name as keyof typeof form]}
                     onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-400 transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-primary-400 transition-colors"
                   />
                 </div>
               ))}
@@ -294,13 +308,13 @@ export default function ProgressTrackingPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full sm:w-auto bg-primary-400 text-black px-8 py-3 rounded-lg font-semibold hover:bg-primary-300 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full sm:w-auto bg-primary-400 text-black px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-primary-300 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs sm:text-sm"
                 >
                   {saving ? (
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Save className="w-4 h-4" />
+                      <Save className="w-3.5 h-3.5" />
                       Save Progress
                     </>
                   )}
@@ -310,7 +324,7 @@ export default function ProgressTrackingPage() {
           </motion.div>
 
           {loading ? (
-            <div className="space-y-6 mb-12">
+            <div className="space-y-4 mb-10">
               {Array(3).fill(null).map((_, index) => (
                 <motion.div
                   key={index}
@@ -319,13 +333,13 @@ export default function ProgressTrackingPage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6"
                 >
-                  <div className="h-4 bg-white/10 rounded w-40 mb-4 animate-pulse" />
-                  <div className="h-64 bg-white/5 rounded-xl animate-pulse" />
+                  <div className="h-3 bg-white/10 rounded w-32 mb-4 animate-pulse" />
+                  <div className="h-52 bg-white/5 rounded-xl animate-pulse" />
                 </motion.div>
               ))}
             </div>
           ) : entries.length > 0 ? (
-            <div className="space-y-6 mb-12">
+            <div className="space-y-4 mb-10">
               <ProgressChart
                 data={entries.map((e) => ({ date: e.date, weight: e.weight }))}
                 dataKey="weight"
@@ -367,21 +381,21 @@ export default function ProgressTrackingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mb-12"
+              className="mb-10"
             >
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-white/10 rounded-lg animate-pulse" />
-                <div className="h-6 bg-white/10 rounded w-32 animate-pulse" />
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-7 h-7 bg-white/10 rounded-lg animate-pulse" />
+                <div className="h-4 bg-white/10 rounded w-24 animate-pulse" />
               </div>
               <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                 <div className="p-4 space-y-3">
                   {Array(4).fill(null).map((_, i) => (
                     <div key={i} className="flex items-center gap-4">
-                      <div className="h-3 bg-white/10 rounded w-24 animate-pulse" />
-                      <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
-                      <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
-                      <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
-                      <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-20 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
+                      <div className="h-2.5 bg-white/10 rounded w-16 animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -392,13 +406,13 @@ export default function ProgressTrackingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mb-12"
+              className="mb-10"
             >
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-primary-400/10 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-primary-400" />
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-7 h-7 bg-primary-400/10 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-3.5 h-3.5 text-primary-400" />
                 </div>
-                <h2 className="text-lg sm:text-xl font-semibold">History</h2>
+                <h2 className="text-base sm:text-lg font-semibold">History</h2>
               </div>
 
               <div className="hidden md:block overflow-hidden rounded-2xl border border-white/10">
@@ -406,25 +420,25 @@ export default function ProgressTrackingPage() {
                   <table className="w-full">
                     <thead className="bg-white/5">
                       <tr>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Date</th>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Weight</th>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Chest</th>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Waist</th>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Arms</th>
-                        <th className="text-left text-xs font-semibold text-white/60 px-4 py-3">Thighs</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Date</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Weight</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Chest</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Waist</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Arms</th>
+                        <th className="text-left text-[11px] sm:text-xs font-semibold text-white/60 px-4 py-2.5">Thighs</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {[...entries].reverse().map((entry) => (
                         <tr key={entry.id} className="hover:bg-white/5">
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-2.5 text-xs sm:text-sm">
                             {new Date(entry.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                           </td>
-                          <td className="px-4 py-3 text-sm text-primary-400 font-semibold">{entry.weight.toFixed(1)} kg</td>
-                          <td className="px-4 py-3 text-sm">{entry.chest ? `${entry.chest.toFixed(1)} cm` : "-"}</td>
-                          <td className="px-4 py-3 text-sm">{entry.waist ? `${entry.waist.toFixed(1)} cm` : "-"}</td>
-                          <td className="px-4 py-3 text-sm">{entry.arms ? `${entry.arms.toFixed(1)} cm` : "-"}</td>
-                          <td className="px-4 py-3 text-sm">{entry.thighs ? `${entry.thighs.toFixed(1)} cm` : "-"}</td>
+                          <td className="px-4 py-2.5 text-xs sm:text-sm text-primary-400 font-semibold">{entry.weight.toFixed(1)} kg</td>
+                          <td className="px-4 py-2.5 text-xs sm:text-sm">{entry.chest ? `${entry.chest.toFixed(1)} cm` : "-"}</td>
+                          <td className="px-4 py-2.5 text-xs sm:text-sm">{entry.waist ? `${entry.waist.toFixed(1)} cm` : "-"}</td>
+                          <td className="px-4 py-2.5 text-xs sm:text-sm">{entry.arms ? `${entry.arms.toFixed(1)} cm` : "-"}</td>
+                          <td className="px-4 py-2.5 text-xs sm:text-sm">{entry.thighs ? `${entry.thighs.toFixed(1)} cm` : "-"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -432,15 +446,15 @@ export default function ProgressTrackingPage() {
                 </div>
               </div>
 
-              <div className="md:hidden space-y-3">
+              <div className="md:hidden space-y-2.5">
                 {[...entries].reverse().map((entry) => (
-                  <div key={entry.id} className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-white/50">
+                  <div key={entry.id} className="bg-white/5 border border-white/10 rounded-xl p-3.5">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-[11px] text-white/50">
                         {new Date(entry.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="grid grid-cols-2 gap-2.5 text-[11px]">
                       <div>
                         <p className="text-white/50">Weight</p>
                         <p className="text-primary-400 font-semibold">{entry.weight.toFixed(1)} kg</p>
@@ -480,12 +494,12 @@ export default function ProgressTrackingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
           >
             {motivationalMessages.map((message, index) => (
-              <div key={index} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-primary-400/30 transition-all">
-                <CheckCircle className="w-6 h-6 text-primary-400 mb-3" />
-                <p className="text-sm font-medium text-white/80 italic">"{message}"</p>
+              <div key={index} className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 hover:border-primary-400/30 transition-all">
+                <CheckCircle className="w-5 h-5 text-primary-400 mb-2.5" />
+                <p className="text-xs sm:text-sm font-medium text-white/80 italic">"{message}"</p>
               </div>
             ))}
           </motion.div>
@@ -494,13 +508,13 @@ export default function ProgressTrackingPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-16"
+              className="text-center py-12"
             >
-              <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Activity className="w-8 h-8 text-primary-400" />
+              <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3.5">
+                <Activity className="w-7 h-7 text-primary-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No Progress Yet</h3>
-              <p className="text-sm text-white/60">Log your first progress entry above to get started!</p>
+              <h3 className="text-base sm:text-lg font-semibold mb-2">No Progress Yet</h3>
+              <p className="text-xs sm:text-sm text-white/60">Log your first progress entry above to get started!</p>
             </motion.div>
           )}
         </div>
